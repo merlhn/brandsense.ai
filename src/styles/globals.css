@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Brand Sense - Vercel Dark Minimalism Design System */
 
 /* Base Reset */
