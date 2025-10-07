@@ -1,0 +1,171 @@
+/* Brand Sense - Vercel Dark Minimalism Design System */
+
+/* Base Reset */
+* {
+  box-sizing: border-box;
+}
+
+/* CSS Variables */
+:root {
+  --font-size: 16px;
+  --background: #000000;
+  --foreground: #EDEDED;
+  --card: #0A0A0A;
+  --card-foreground: #EDEDED;
+  --popover: #0A0A0A;
+  --popover-foreground: #EDEDED;
+  --primary: #0070F3;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1A1A1A;
+  --secondary-foreground: #EDEDED;
+  --muted: #161616;
+  --muted-foreground: #888888;
+  --accent: #0070F3;
+  --accent-foreground: #FFFFFF;
+  --destructive: #E5484D;
+  --destructive-foreground: #FFFFFF;
+  --border: #333333;
+  --input: #1A1A1A;
+  --input-background: #0A0A0A;
+  --switch-background: #1A1A1A;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #0070F3;
+  --success: #46A758;
+  --vercel-blue: #0070F3;
+  --vercel-green: #46A758;
+  --chart-1: #E88C30;
+  --chart-2: #3B9B9B;
+  --chart-3: #5A5F75;
+  --chart-4: #F4D03F;
+  --chart-5: #E8A838;
+  --radius: 0.5rem;
+  --sidebar: #0A0A0A;
+  --sidebar-foreground: #EDEDED;
+  --sidebar-primary: #0070F3;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #1A1A1A;
+  --sidebar-accent-foreground: #EDEDED;
+  --sidebar-border: #333333;
+  --sidebar-ring: #0070F3;
+}
+
+@theme inline {
+  /* Force dark colors - Tailwind v4 inline theme */
+  --color-background: #000000;
+  --color-foreground: #EDEDED;
+  --color-card: #0A0A0A;
+  --color-card-foreground: #EDEDED;
+  --color-popover: #0A0A0A;
+  --color-popover-foreground: #EDEDED;
+  --color-primary: #0070F3;
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #1A1A1A;
+  --color-secondary-foreground: #EDEDED;
+  --color-muted: #161616;
+  --color-muted-foreground: #888888;
+  --color-accent: #0070F3;
+  --color-accent-foreground: #FFFFFF;
+  --color-destructive: #E5484D;
+  --color-destructive-foreground: #FFFFFF;
+  --color-border: #333333;
+  --color-input: #1A1A1A;
+  --color-input-background: #0A0A0A;
+  --color-switch-background: #1A1A1A;
+  --color-ring: #0070F3;
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-success: var(--success);
+  --color-vercel-blue: var(--vercel-blue);
+  --color-vercel-green: var(--vercel-green);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html,
+  body,
+  #root {
+    background: var(--background);
+    color: var(--foreground);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/**
+ * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    h1 {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h2 {
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h3 {
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h4 {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    p {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+
+    label {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    button {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    input {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+}
