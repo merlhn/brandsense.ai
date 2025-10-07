@@ -9,6 +9,11 @@ export default defineConfig({
     tailwindcss()
   ],
   build: {
+<<<<<<< HEAD
+=======
+    // Output directory (Vercel expects 'dist')
+    outDir: 'dist',
+>>>>>>> cad069b (new version from Figma Make)
     // Enable tree shaking
     minify: 'terser',
     terserOptions: {

@@ -1,4 +1,10 @@
 {
+<<<<<<< HEAD
+=======
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+>>>>>>> cad069b (new version from Figma Make)
   "headers": [
     {
       "source": "/(.*)",
