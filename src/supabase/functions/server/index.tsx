@@ -713,6 +713,23 @@ async function analyzeBrandInBackground(
   try {
     console.log(`🔄 Starting background analysis for ${brandName} in ${market}`);
     
+    // Check cache first (NEW: Performance optimization)
+    const cacheKey = `analysis:${brandName}:${market}:${language}`;
+    const cached = await kv.get(cacheKey);
+    
+    if (cached) {
+      console.log('🚀 Using cached analysis - instant response!');
+      await kv.set(`project_data:${projectId}`, cached);
+      await supabase
+        .from('projects')
+        .update({
+          data_status: 'ready',
+          last_refreshed_at: new Date().toISOString(),
+        })
+        .eq('id', projectId);
+      return;
+    }
+    
     // Check if demo mode is enabled
     const useDemoMode = Deno.env.get('DEMO_MODE') === 'true' || !Deno.env.get('OPENAI_API_KEY');
     
@@ -733,6 +750,10 @@ async function analyzeBrandInBackground(
       sentimentAnalysis,
       keywordAnalysis,
     };
+    
+    // Cache the analysis for future use (NEW: Performance optimization)
+    await kv.set(cacheKey, fullData, { expireIn: 86400 }); // 24 hours
+    console.log(`💾 Cached analysis for future use: ${cacheKey}`);
     
     // Store in KV store (matching GET endpoint)
     const dataKey = `project_data:${projectId}`;
