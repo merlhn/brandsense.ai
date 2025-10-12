@@ -102,6 +102,78 @@ app.options("/*", (c) => {
 });
 
 // ============================================
+// USER PROFILE ROUTE - MOVED TO TOP
+// ============================================
+
+/**
+ * POST /make-server-cf9a9609/user/profile
+ * Headers: Authorization: Bearer <access_token>
+ * Body: { fullName, position, company }
+ */
+app.post("/make-server-cf9a9609/user/profile", async (c) => {
+  console.log('🔍 Profile endpoint hit!', c.req.method, c.req.url);
+  console.log('🔍 Headers:', c.req.header('Authorization') ? 'Present' : 'Missing');
+  try {
+    const authHeader = c.req.header('Authorization');
+    const { error: authError, user } = await verifyAuth(authHeader);
+
+    if (authError || !user) {
+      return c.json({ error: authError || 'Unauthorized' }, 401);
+    }
+
+    const body = await c.req.json();
+    const { fullName, position, company } = body;
+
+    // Validate required fields
+    if (!fullName) {
+      return c.json({ 
+        error: 'Full name is required' 
+      }, 400);
+    }
+
+    const supabase = getSupabaseAdminClient();
+
+    // Update user profile in public.users table
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({
+        full_name: fullName.trim(),
+        position: position?.trim() || null,
+        company: company?.trim() || null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', user.id);
+
+    if (updateError) {
+      console.error('Profile update error:', updateError);
+      return c.json({ 
+        error: updateError.message || 'Failed to update profile' 
+      }, 500);
+    }
+
+    console.log('✅ Profile updated successfully for user:', user.email);
+
+    return c.json({ 
+      success: true,
+      message: 'Profile updated successfully',
+      user: {
+        id: user.id,
+        email: user.email,
+        fullName: fullName.trim(),
+        position: position?.trim() || null,
+        company: company?.trim() || null
+      }
+    });
+
+  } catch (error) {
+    console.error('Profile update endpoint error:', error);
+    return c.json({ 
+      error: 'Internal server error during profile update' 
+    }, 500);
+  }
+});
+
+// ============================================
 // UTILITIES
 // ============================================
 
@@ -571,74 +643,6 @@ app.post("/make-server-cf9a9609/auth/change-password", async (c) => {
     console.error('Change password endpoint error:', error);
     return c.json({ 
       error: 'Internal server error during password change' 
-    }, 500);
-  }
-});
-
-/**
- * POST /make-server-cf9a9609/user/profile
- * Headers: Authorization: Bearer <access_token>
- * Body: { fullName, position, company }
- */
-app.post("/make-server-cf9a9609/user/profile", async (c) => {
-  console.log('🔍 Profile endpoint hit!', c.req.method, c.req.url);
-  console.log('🔍 Headers:', c.req.header('Authorization') ? 'Present' : 'Missing');
-  try {
-    const authHeader = c.req.header('Authorization');
-    const { error: authError, user } = await verifyAuth(authHeader);
-
-    if (authError || !user) {
-      return c.json({ error: authError || 'Unauthorized' }, 401);
-    }
-
-    const body = await c.req.json();
-    const { fullName, position, company } = body;
-
-    // Validate required fields
-    if (!fullName) {
-      return c.json({ 
-        error: 'Full name is required' 
-      }, 400);
-    }
-
-    const supabase = getSupabaseAdminClient();
-
-    // Update user profile in public.users table
-    const { error: updateError } = await supabase
-      .from('users')
-      .update({
-        full_name: fullName.trim(),
-        position: position?.trim() || null,
-        company: company?.trim() || null,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', user.id);
-
-    if (updateError) {
-      console.error('Profile update error:', updateError);
-      return c.json({ 
-        error: updateError.message || 'Failed to update profile' 
-      }, 500);
-    }
-
-    console.log('✅ Profile updated successfully for user:', user.email);
-
-    return c.json({ 
-      success: true,
-      message: 'Profile updated successfully',
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: fullName.trim(),
-        position: position?.trim() || null,
-        company: company?.trim() || null
-      }
-    });
-
-  } catch (error) {
-    console.error('Profile update endpoint error:', error);
-    return c.json({ 
-      error: 'Internal server error during profile update' 
     }, 500);
   }
 });
