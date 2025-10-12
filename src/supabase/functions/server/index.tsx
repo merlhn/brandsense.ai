@@ -87,28 +87,56 @@ app.use('*', logger(console.log));
  * Headers: Authorization: Bearer <access_token>
  * Body: { fullName, position }
  */
-app.post("/user/profile-update", async (c) => {
+app.post("/", async (c) => {
   console.log('🔍 Profile Update Endpoint Hit!', c.req.method, c.req.url);
   console.log('🔍 Headers:', c.req.header('Authorization') ? 'Present' : 'Missing');
+  console.log('🔍 All Headers:', Object.fromEntries(c.req.header()));
+  console.log('🔍 Backend - Request method:', c.req.method);
+  console.log('🔍 Backend - Request URL:', c.req.url);
+  console.log('🔍 Backend - Request path:', c.req.path);
+  console.log('🔍 Backend - Request query:', c.req.query());
+  console.log('🔍 Backend - Request headers count:', Object.keys(c.req.header()).length);
 
   try {
+    console.log('🔍 Step 1: Request received');
     const authHeader = c.req.header('Authorization');
+    console.log('🔍 Step 2: Auth header check:', authHeader ? 'Present' : 'Missing');
+    console.log('🔍 Backend - Auth header value:', authHeader);
+    
     const { error: authError, user } = await verifyAuth(authHeader);
+    console.log('🔍 Step 3: Auth verification result:', { error: authError?.message, userId: user?.id });
+    console.log('🔍 Backend - Auth error details:', authError);
+    console.log('🔍 Backend - User details:', user);
 
     if (authError || !user) {
       console.error('❌ Authentication Error:', authError || 'Unauthorized');
       return c.json({ error: authError?.message || 'Unauthorized' }, 401);
     }
 
+    console.log('🔍 Step 4: Parsing request body');
     const body = await c.req.json();
+    console.log('🔍 Step 5: Request body received:', body);
+    console.log('🔍 Backend - Request body type:', typeof body);
+    console.log('🔍 Backend - Request body keys:', Object.keys(body));
+    console.log('🔍 Backend - Request body stringified:', JSON.stringify(body));
+    
     const { fullName, position } = body;
+    console.log('🔍 Backend - Extracted fullName:', fullName);
+    console.log('🔍 Backend - Extracted position:', position);
 
+    console.log('🔍 Step 6: Validation check');
+    console.log('🔍 Backend - Full name validation:', { fullName, isEmpty: !fullName, type: typeof fullName });
     // Validate required fields
     if (!fullName) {
       console.error('❌ Validation Error: Full name is required');
       return c.json({ error: 'Full name is required' }, 400);
     }
 
+    console.log('🔍 Step 7: Updating user metadata in Supabase');
+    console.log('🔍 Backend - User ID for update:', user.id);
+    console.log('🔍 Backend - Update data:', { fullName, position });
+    console.log('🔍 Backend - Supabase client status:', supabase ? 'Available' : 'Missing');
+    
     // Update user metadata in Supabase
     const { data, error: updateError } = await supabase.auth.admin.updateUserById(
       user.id,
@@ -120,12 +148,22 @@ app.post("/user/profile-update", async (c) => {
       }
     );
 
+    console.log('🔍 Step 8: Supabase update result:', { error: updateError?.message, success: !updateError });
+    console.log('🔍 Backend - Supabase response data:', data);
+    console.log('🔍 Backend - Supabase response error:', updateError);
+    console.log('🔍 Backend - Supabase response error message:', updateError?.message);
+    console.log('🔍 Backend - Supabase response error code:', updateError?.code);
+    
     if (updateError) {
       console.error('❌ Supabase Update Error:', updateError.message);
+      console.error('❌ Supabase Update Error Code:', updateError.code);
+      console.error('❌ Supabase Update Error Details:', updateError);
       return c.json({ error: updateError.message }, 500);
     }
 
     console.log('✅ Profile updated successfully for user:', user.id);
+    console.log('🔍 Backend - Updated user data:', data.user);
+    console.log('🔍 Step 9: Returning success response');
     return c.json({ message: 'Profile updated successfully', user: data.user });
 
   } catch (error: any) {

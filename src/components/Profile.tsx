@@ -72,20 +72,43 @@ export function Profile({ onNavigate }: ProfileProps) {
       }
 
       console.log('📡 Making profile update API call...');
-      const endpointUrl = "https://vtnglubfoyvfwuxxbugs.supabase.co/functions/v1/make-server-cf9a9609/user/profile-update";
+      const endpointUrl = "https://vtnglubfoyvfwuxxbugs.supabase.co/functions/v1/make-server-cf9a9609/";
       console.log('🔍 Endpoint URL:', endpointUrl);
+      
+      const requestBody = {
+        fullName: fullName.trim(),
+        position: position.trim(),
+      };
+      
+      const requestHeaders = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      };
+      
+      console.log('🔍 Frontend Request Details:', {
+        url: endpointUrl,
+        method: 'POST',
+        headers: requestHeaders,
+        body: requestBody
+      });
+      
+      console.log('🔍 Frontend - About to make fetch request');
+      console.log('🔍 Frontend - Request URL:', endpointUrl);
+      console.log('🔍 Frontend - Request Method: POST');
+      console.log('🔍 Frontend - Request Headers:', requestHeaders);
+      console.log('🔍 Frontend - Request Body:', requestBody);
       
       const response = await fetch(endpointUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          fullName: fullName.trim(),
-          position: position.trim(),
-        }),
+        headers: requestHeaders,
+        body: JSON.stringify(requestBody),
       });
+      
+      console.log('🔍 Frontend - Fetch request completed');
+      console.log('🔍 Frontend - Response status:', response.status);
+      console.log('🔍 Frontend - Response headers:', Object.fromEntries(response.headers.entries()));
+      console.log('🔍 Frontend - Response ok:', response.ok);
+      console.log('🔍 Frontend - Response statusText:', response.statusText);
       
       console.log('📡 Profile update API call completed');
       const data = await response.json();
@@ -288,10 +311,12 @@ export function Profile({ onNavigate }: ProfileProps) {
                 <Input
                   id="fullName"
                   value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  disabled={!isEditingInfo}
-                  className="h-11 bg-input-background border-border disabled:opacity-100 disabled:cursor-default"
+                  disabled
+                  className="h-11 bg-input-background border-border opacity-60 cursor-not-allowed"
                 />
+                <p className="text-muted-foreground tracking-tight">
+                  Full name cannot be changed
+                </p>
               </div>
 
               <div className="space-y-2">
