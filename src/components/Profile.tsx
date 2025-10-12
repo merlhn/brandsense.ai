@@ -58,30 +58,16 @@ export function Profile({ onNavigate }: ProfileProps) {
   }, []);
 
   const handleSaveInfo = async () => {
+    console.log('🚀 Profile Update - Starting save process');
     setIsSavingInfo(true);
     
     try {
       const accessToken = storage.getAccessToken();
       console.log('🔍 Profile Update - Access Token:', accessToken ? 'Present' : 'Missing');
+      console.log('🔍 Profile Update - Data to save:', { fullName, position, company });
       
-      // Check backend health first
-      try {
-        const healthResponse = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/health`
-        );
-        if (!healthResponse.ok) {
-          console.log('❌ Backend health check failed');
-          toast.error("Backend is currently unavailable. Please try again later.");
-          setIsSavingInfo(false);
-          return;
-        }
-        console.log('✅ Backend health check passed');
-      } catch (healthError) {
-        console.log('❌ Backend health check error:', healthError);
-        toast.error("Cannot connect to server. Please check your internet connection.");
-        setIsSavingInfo(false);
-        return;
-      }
+      // Skip health check for now - direct to profile update
+      console.log('⏭️ Skipping health check - going directly to profile update');
       
       if (!accessToken) {
         console.log('❌ No access token found');
@@ -94,6 +80,10 @@ export function Profile({ onNavigate }: ProfileProps) {
         return;
       }
 
+      console.log('📡 Making profile update API call...');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
       const response = await fetch(
         `https://${projectId}.supabase.co/functions/v1/user/profile`,
         {
@@ -107,8 +97,12 @@ export function Profile({ onNavigate }: ProfileProps) {
             position: position.trim(),
             company: company.trim(),
           }),
+          signal: controller.signal,
         }
       );
+      
+      clearTimeout(timeoutId);
+      console.log('📡 Profile update API call completed');
 
       const data = await response.json();
       console.log('📡 Profile Update Response:', { status: response.status, data });
