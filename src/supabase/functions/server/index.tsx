@@ -24,6 +24,57 @@ if (!Deno.env.get('SUPABASE_URL') || !Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'))
   console.error('Please configure these in your Supabase Edge Function settings');
 }
 
+// ============================================
+// PUBLIC HEALTH CHECK (NO AUTH REQUIRED)
+// ============================================
+
+// Public health check endpoint (no auth required)
+app.get("/health", (c) => {
+  return c.json({ 
+    status: "ok", 
+    timestamp: new Date().toISOString(),
+    environment: {
+      supabaseUrl: !!Deno.env.get('SUPABASE_URL'),
+      supabaseServiceRoleKey: !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
+      anonKey: !!Deno.env.get('ANON_KEY'),
+      openaiApiKey: !!Deno.env.get('OPENAI_API_KEY'),
+    }
+  });
+});
+
+// Alternative public health check with different path
+app.get("/status", (c) => {
+  return c.json({ 
+    status: "ok", 
+    timestamp: new Date().toISOString(),
+    environment: {
+      supabaseUrl: !!Deno.env.get('SUPABASE_URL'),
+      supabaseServiceRoleKey: !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
+      anonKey: !!Deno.env.get('ANON_KEY'),
+      openaiApiKey: !!Deno.env.get('OPENAI_API_KEY'),
+    }
+  });
+});
+
+// Simple test endpoint
+app.get("/test", (c) => {
+  return c.text("OK");
+});
+
+// Ping endpoint
+app.get("/ping", (c) => {
+  return c.json({ pong: true, timestamp: new Date().toISOString() });
+});
+
+// Root endpoint
+app.get("/", (c) => {
+  return c.json({ 
+    message: "BrandSense API is running",
+    timestamp: new Date().toISOString(),
+    version: "1.0.0"
+  });
+});
+
 // Enable logger
 app.use('*', logger(console.log));
 
@@ -38,6 +89,11 @@ app.use(
     maxAge: 600,
   }),
 );
+
+// Handle preflight requests
+app.options("/*", (c) => {
+  return c.text("", 200);
+});
 
 // ============================================
 // UTILITIES
@@ -109,9 +165,10 @@ async function verifyAuth(authHeader: string | null) {
 }
 
 // ============================================
-// HEALTH CHECK
+// LEGACY HEALTH CHECK (WITH AUTH)
 // ============================================
 
+// Legacy health check endpoint (with auth)
 app.get("/make-server-cf9a9609/health", (c) => {
   return c.json({ 
     status: "ok", 
