@@ -78,28 +78,7 @@ app.get("/", (c) => {
 // Enable logger
 app.use('*', logger(console.log));
 
-// Enable CORS for all routes and methods - MOVED TO TOP
-app.use(
-  "/*",
-  cors({
-    origin: "*",
-    allowHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    exposeHeaders: ["Content-Length", "X-Total-Count"],
-    maxAge: 86400, // 24 hours
-    credentials: false,
-  }),
-);
-
-// Handle preflight requests explicitly
-app.options("/*", (c) => {
-  return c.text("", 200, {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
-    "Access-Control-Max-Age": "86400",
-  });
-});
+// CORS middleware moved to bottom - after all routes
 
 // ============================================
 // USER PROFILE ROUTE - MOVED TO TOP
@@ -1618,6 +1597,29 @@ app.post('/make-server-cf9a9609/feedback', async (c) => {
     console.error('Error processing feedback:', error);
     return c.json({ error: 'Internal server error' }, 500);
   }
+});
+
+// Enable CORS for all routes and methods - MOVED TO BOTTOM
+app.use(
+  "/*",
+  cors({
+    origin: "*",
+    allowHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    exposeHeaders: ["Content-Length", "X-Total-Count"],
+    maxAge: 86400, // 24 hours
+    credentials: false,
+  }),
+);
+
+// Handle preflight requests explicitly
+app.options("/*", (c) => {
+  return c.text("", 200, {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+    "Access-Control-Max-Age": "86400",
+  });
 });
 
 Deno.serve(app.fetch);
