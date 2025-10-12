@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "motion/react";
 import { Globe, MessageSquare, FileText, Calendar, RefreshCw, Cpu, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Textarea } from "./ui/textarea";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -57,34 +55,9 @@ export function ProjectSettings({ onNavigate, onDeleteProject, selectedProject }
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Project update state
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  
-  // Form state
-  const [formData, setFormData] = useState({
-    name: "",
-    market: "",
-    language: "",
-    description: "",
-    industry: "",
-    websiteUrl: ""
-  });
+  // Project Settings is now read-only - no editing state needed
 
-  // Initialize form data when project changes
-  useEffect(() => {
-    if (selectedProject) {
-      setFormData({
-        name: selectedProject.name || "",
-        market: selectedProject.market || "",
-        language: selectedProject.language || "",
-        description: selectedProject.description || "",
-        industry: selectedProject.industry || "",
-        websiteUrl: selectedProject.websiteUrl || ""
-      });
-    }
-  }, [selectedProject]);
+  // No form data initialization needed for read-only view
 
   // Convert market and language from display format to select values for display
   const marketValueMap: Record<string, string> = {
@@ -127,111 +100,9 @@ export function ProjectSettings({ onNavigate, onDeleteProject, selectedProject }
     : "February 28, 2025";
   const aiModel = selectedProject?.aiModel || "GPT-4o";
 
-  const handleSaveProject = async () => {
-    if (!selectedProject) return;
-    
-    setIsSaving(true);
-    
-    try {
-      const accessToken = storage.getAccessToken();
-      if (!accessToken) {
-        toast.error('Session expired. Please sign in again.');
-        setIsSaving(false);
-        return;
-      }
+  // No save function needed for read-only view
 
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/projects/${selectedProject.id}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            name: formData.name.trim(),
-            market: formData.market.trim(),
-            language: formData.language.trim(),
-            description: formData.description.trim() || undefined,
-            industry: formData.industry.trim() || undefined,
-            websiteUrl: formData.websiteUrl.trim() || undefined,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast.error(data.error || 'Failed to update project');
-        setIsSaving(false);
-        return;
-      }
-
-      // Success - sync all projects from backend
-      console.log('🔄 Syncing all projects from backend after update...');
-      
-      try {
-        // Fetch all projects from backend
-        const projectsResponse = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/projects`,
-          {
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-            },
-          }
-        );
-
-        if (projectsResponse.ok) {
-          const projectsData = await projectsResponse.json();
-          const backendProjects = projectsData.projects || [];
-          
-          console.log(`✅ Fetched ${backendProjects.length} projects from backend`);
-          
-          // Sync storage with backend - backend is source of truth
-          storage.syncProjectsFromBackend(backendProjects);
-          
-          console.log('✅ Projects synced successfully');
-        } else {
-          console.warn('⚠️ Failed to fetch updated projects, using local update');
-          // Fallback: update localStorage only
-          const updatedProject = { ...selectedProject, ...data.project };
-          storage.saveProject(updatedProject);
-        }
-      } catch (syncError) {
-        console.error('❌ Failed to sync projects from backend:', syncError);
-        // Fallback: update localStorage only
-        const updatedProject = { ...selectedProject, ...data.project };
-        storage.saveProject(updatedProject);
-      }
-
-      setIsSaving(false);
-      setIsEditing(false);
-      setShowSuccessMessage(true);
-      setTimeout(() => setShowSuccessMessage(false), 3000);
-      
-      toast.success('Project updated successfully!');
-      
-    } catch (error) {
-      console.error('Project update error:', error);
-      toast.error('Failed to update project. Please try again.');
-      setIsSaving(false);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-    // Reset form data to original values
-    if (selectedProject) {
-      setFormData({
-        name: selectedProject.name || "",
-        market: selectedProject.market || "",
-        language: selectedProject.language || "",
-        description: selectedProject.description || "",
-        industry: selectedProject.industry || "",
-        websiteUrl: selectedProject.websiteUrl || ""
-      });
-    }
-  };
+  // No cancel function needed for read-only view
 
   const handleDeleteProject = async () => {
     if (!selectedProject) return;
@@ -361,35 +232,9 @@ export function ProjectSettings({ onNavigate, onDeleteProject, selectedProject }
               <div>
                 <h2 className="text-foreground tracking-tight mb-1">Project Information</h2>
                 <p className="text-muted-foreground tracking-tight">
-                  {isEditing ? "Edit your project details and configuration" : "View your project details and configuration"}
+                  View your project details and configuration
                 </p>
               </div>
-              {!isEditing ? (
-                <Button
-                  onClick={() => setIsEditing(true)}
-                  variant="outline"
-                  className="h-9 px-4 bg-card border-border hover:bg-secondary/80"
-                >
-                  Edit
-                </Button>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Button
-                    onClick={handleCancelEdit}
-                    variant="outline"
-                    className="h-9 px-4 bg-card border-border hover:bg-secondary/80"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleSaveProject}
-                    disabled={isSaving}
-                    className="h-9 px-4 bg-primary hover:bg-primary/90"
-                  >
-                    {isSaving ? "Saving..." : "Save"}
-                  </Button>
-                </div>
-              )}
             </div>
 
             {/* Form Fields */}
@@ -405,42 +250,17 @@ export function ProjectSettings({ onNavigate, onDeleteProject, selectedProject }
                     <Label htmlFor="brandName" className="text-muted-foreground">
                       Brand Name
                     </Label>
-                    {isEditing ? (
-                      <Input
-                        id="brandName"
-                        value={formData.name}
-                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                        className="h-11 bg-input-background border-border"
-                        placeholder="Enter brand name"
-                      />
-                    ) : (
-                      <div className="h-11 px-4 rounded-md bg-input-background border border-border flex items-center text-foreground">
-                        {brandName}
-                      </div>
-                    )}
+                    <div className="h-11 px-4 rounded-md bg-input-background border border-border flex items-center text-foreground">
+                      {brandName}
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="market" className="text-muted-foreground">
                       Market
                     </Label>
-                    {isEditing ? (
-                      <select
-                        id="market"
-                        value={formData.market}
-                        onChange={(e) => setFormData(prev => ({ ...prev, market: e.target.value }))}
-                        className="h-11 px-4 rounded-md bg-input-background border border-border text-foreground"
-                      >
-                        {markets.map(market => (
-                          <option key={market.value} value={market.value}>
-                            {market.label}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <div className="h-11 px-4 rounded-md bg-input-background border border-border flex items-center text-foreground">
-                        {markets.find(m => m.value === market)?.label || "Türkiye"}
-                      </div>
-                    )}
+                    <div className="h-11 px-4 rounded-md bg-input-background border border-border flex items-center text-foreground">
+                      {markets.find(m => m.value === market)?.label || "Türkiye"}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -452,24 +272,9 @@ export function ProjectSettings({ onNavigate, onDeleteProject, selectedProject }
                     <MessageSquare className="w-4 h-4 inline mr-2" />
                     Language
                   </Label>
-                  {isEditing ? (
-                    <select
-                      id="language"
-                      value={formData.language}
-                      onChange={(e) => setFormData(prev => ({ ...prev, language: e.target.value }))}
-                      className="h-11 px-4 rounded-md bg-input-background border border-border text-foreground"
-                    >
-                      {languages.map(lang => (
-                        <option key={lang.value} value={lang.value}>
-                          {lang.label}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <div className="h-11 px-4 rounded-md bg-input-background border border-border flex items-center text-foreground">
-                      {languages.find(l => l.value === language)?.label || "Turkish"}
-                    </div>
-                  )}
+                  <div className="h-11 px-4 rounded-md bg-input-background border border-border flex items-center text-foreground">
+                    {languages.find(l => l.value === language)?.label || "Turkish"}
+                  </div>
                 </div>
               </div>
 
@@ -477,19 +282,9 @@ export function ProjectSettings({ onNavigate, onDeleteProject, selectedProject }
                 <Label htmlFor="description" className="text-foreground">
                   Description
                 </Label>
-                {isEditing ? (
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    className="min-h-[100px] bg-input-background border-border"
-                    placeholder="Enter project description"
-                  />
-                ) : (
-                  <div className="min-h-[100px] px-4 py-3 rounded-md bg-input-background border border-border text-foreground">
-                    {description}
-                  </div>
-                )}
+                <div className="min-h-[100px] px-4 py-3 rounded-md bg-input-background border border-border text-foreground">
+                  {description}
+                </div>
               </div>
             </div>
           </section>
