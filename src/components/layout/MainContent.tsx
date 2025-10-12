@@ -8,7 +8,7 @@ import { AccountSettings } from "../AccountSettings";
 
 interface MainContentProps {
   activeItem: string;
-  selectedProject: Project | null;
+  selectedProject: Project;
   onNavigate?: (screen: string) => void;
   onDeleteProject?: () => void;
 }
@@ -19,20 +19,6 @@ export function MainContent({
   onNavigate,
   onDeleteProject
 }: MainContentProps) {
-  if (!selectedProject) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center">
-          <h3 className="text-foreground tracking-tight mb-2 text-[18px] font-medium">
-            No Project Selected
-          </h3>
-          <p className="text-muted-foreground tracking-tight text-[15px]">
-            Please select a project to view the dashboard.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   const renderContent = () => {
     switch (activeItem) {
@@ -47,25 +33,6 @@ export function MainContent({
       case 'account-settings':
         return <AccountSettings onNavigate={onNavigate} />;
       case 'project-settings':
-        if (!selectedProject) {
-          return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-6xl mb-4">📁</div>
-                <h1 className="text-2xl font-bold text-foreground mb-2">No Project Selected</h1>
-                <p className="text-muted-foreground mb-4">
-                  Please create a project first to view its settings.
-                </p>
-                <button
-                  onClick={() => onNavigate?.('onboarding-brand')}
-                  className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                >
-                  Create Project
-                </button>
-              </div>
-            </div>
-          );
-        }
         return (
           <ProjectSettings 
             onNavigate={onNavigate} 

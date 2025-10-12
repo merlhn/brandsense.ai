@@ -609,30 +609,6 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     }
   };
 
-  // Handle case when no project is selected
-  if (!selectedProject) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-6">
-            <Binoculars className="w-8 h-8 text-primary" />
-          </div>
-          <h3 className="text-foreground tracking-tight mb-2 text-[18px] font-medium">
-            No Project Selected
-          </h3>
-          <p className="text-muted-foreground tracking-tight text-[15px] mb-6">
-            Please select a project to view the dashboard.
-          </p>
-          <button
-            onClick={() => onNavigate?.(SCREENS.ONBOARDING_BRAND)}
-            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
-            Create Project
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="h-screen bg-background flex">
