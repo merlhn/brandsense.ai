@@ -74,6 +74,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showDataCorruptionDialog, setShowDataCorruptionDialog] = useState(false);
+  const [userEmail, setUserEmail] = useState(storage.getUserEmail() || 'user@company.com');
   const [showOnboardingBanner, setShowOnboardingBanner] = useState(() => {
     // Only show banner if user hasn't dismissed it before
     const dismissed = localStorage.getItem('onboarding_banner_dismissed');
@@ -112,6 +113,26 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       onNavigate?.(SCREENS.SIGN_IN);
     }
   }, [onNavigate]);
+
+  // Email değişikliklerini dinle
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const email = storage.getUserEmail();
+      if (email) {
+        setUserEmail(email);
+      }
+    };
+
+    // Storage değişikliklerini dinle
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Component mount olduğunda da kontrol et
+    handleStorageChange();
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   // Listen for data recovery trigger from child components
   useEffect(() => {
@@ -825,9 +846,8 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
             <div className="w-7 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
               <span className="text-primary tracking-tight text-[12px] font-medium">
                 {(() => {
-                  const email = storage.getUserEmail() || '';
-                  if (email) {
-                    const localPart = email.split('@')[0];
+                  if (userEmail) {
+                    const localPart = userEmail.split('@')[0];
                     const parts = localPart.split('.');
                     if (parts.length >= 2) {
                       return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
@@ -840,7 +860,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
             </div>
             <div className="flex-1 text-left min-w-0">
               <p className="text-sidebar-foreground tracking-tight truncate text-[13px] font-medium">
-                {storage.getUserEmail() || 'user@company.com'}
+                {userEmail}
               </p>
             </div>
           </div>
