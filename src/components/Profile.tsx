@@ -67,7 +67,7 @@ export function Profile({ onNavigate }: ProfileProps) {
       // Check backend health first
       try {
         const healthResponse = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/health`
+          `https://${projectId}.supabase.co/functions/v1/health`
         );
         if (!healthResponse.ok) {
           console.log('❌ Backend health check failed');
@@ -95,7 +95,7 @@ export function Profile({ onNavigate }: ProfileProps) {
       }
 
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/user/profile`,
+        `https://${projectId}.supabase.co/functions/v1/user/profile`,
         {
           method: 'PUT',
           headers: {
