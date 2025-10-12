@@ -581,6 +581,8 @@ app.post("/make-server-cf9a9609/auth/change-password", async (c) => {
  * Body: { fullName, position, company }
  */
 app.post("/make-server-cf9a9609/user/profile", async (c) => {
+  console.log('🔍 Profile endpoint hit!', c.req.method, c.req.url);
+  console.log('🔍 Headers:', c.req.header('Authorization') ? 'Present' : 'Missing');
   try {
     const authHeader = c.req.header('Authorization');
     const { error: authError, user } = await verifyAuth(authHeader);
