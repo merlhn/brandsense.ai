@@ -40,6 +40,11 @@
       "source": "/",
       "destination": "/landing",
       "permanent": false
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard/identity",
+      "permanent": false
     }
   ]
 }

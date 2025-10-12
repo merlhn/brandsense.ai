@@ -28,7 +28,7 @@ export default function App() {
     const handleRoute = () => {
       const path = window.location.pathname;
       
-      // URL-based routing
+      // URL-based routing for all pages
       if (path === '/landing' || path === '/') {
         setActiveScreen(SCREENS.LANDING);
         setIsValidating(false);
@@ -47,7 +47,43 @@ export default function App() {
         return;
       }
       
-      if (path === '/dashboard') {
+      if (path === '/forgot-password') {
+        setActiveScreen(SCREENS.FORGOT_PASSWORD);
+        setIsValidating(false);
+        return;
+      }
+      
+      if (path === '/reset-password') {
+        setActiveScreen(SCREENS.RESET_PASSWORD);
+        setIsValidating(false);
+        return;
+      }
+      
+      if (path === '/reset-success') {
+        setActiveScreen(SCREENS.RESET_SUCCESS);
+        setIsValidating(false);
+        return;
+      }
+      
+      if (path === '/reset-fail') {
+        setActiveScreen(SCREENS.RESET_FAIL);
+        setIsValidating(false);
+        return;
+      }
+      
+      if (path === '/session-expired') {
+        setActiveScreen(SCREENS.SESSION_EXPIRED);
+        setIsValidating(false);
+        return;
+      }
+      
+      if (path === '/onboarding' || path === '/onboarding/brand') {
+        setActiveScreen(SCREENS.CREATE_PROJECT);
+        setIsValidating(false);
+        return;
+      }
+      
+      if (path === '/dashboard' || path.startsWith('/dashboard/')) {
         setActiveScreen(SCREENS.DASHBOARD);
         setIsValidating(false);
         return;
@@ -83,6 +119,12 @@ export default function App() {
       [SCREENS.LANDING]: '/landing',
       [SCREENS.SIGN_IN]: '/signin',
       [SCREENS.SIGN_UP]: '/signup',
+      [SCREENS.FORGOT_PASSWORD]: '/forgot-password',
+      [SCREENS.RESET_PASSWORD]: '/reset-password',
+      [SCREENS.RESET_SUCCESS]: '/reset-success',
+      [SCREENS.RESET_FAIL]: '/reset-fail',
+      [SCREENS.SESSION_EXPIRED]: '/session-expired',
+      [SCREENS.CREATE_PROJECT]: '/onboarding',
       [SCREENS.DASHBOARD]: '/dashboard',
     };
     

@@ -30,6 +30,76 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
   const [activeItem, setActiveItem] = useState("identity");
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+
+  // Handle dashboard sub-routing
+  useEffect(() => {
+    const handleDashboardRoute = () => {
+      const path = window.location.pathname;
+      
+      // Dashboard sub-routes
+      if (path === '/dashboard' || path === '/dashboard/') {
+        setActiveItem('identity');
+        return;
+      }
+      
+      if (path === '/dashboard/identity') {
+        setActiveItem('identity');
+        return;
+      }
+      
+      if (path === '/dashboard/sentiment') {
+        setActiveItem('sentiment');
+        return;
+      }
+      
+      if (path === '/dashboard/keyword') {
+        setActiveItem('keyword');
+        return;
+      }
+      
+      if (path === '/dashboard/profile') {
+        setActiveItem('profile');
+        return;
+      }
+      
+      if (path === '/dashboard/account-settings') {
+        setActiveItem('account-settings');
+        return;
+      }
+      
+      if (path === '/dashboard/project-settings') {
+        setActiveItem('project-settings');
+        return;
+      }
+      
+      // Default to identity if no match
+      setActiveItem('identity');
+    };
+    
+    handleDashboardRoute();
+    
+    // Listen for browser back/forward
+    window.addEventListener('popstate', handleDashboardRoute);
+    return () => window.removeEventListener('popstate', handleDashboardRoute);
+  }, []);
+
+  // Update URL when activeItem changes
+  const handleSetActiveItem = (item: string) => {
+    setActiveItem(item);
+    
+    // Update URL based on active item
+    const pathMap: Record<string, string> = {
+      'identity': '/dashboard/identity',
+      'sentiment': '/dashboard/sentiment',
+      'keyword': '/dashboard/keyword',
+      'profile': '/dashboard/profile',
+      'account-settings': '/dashboard/account-settings',
+      'project-settings': '/dashboard/project-settings',
+    };
+    
+    const path = pathMap[item] || '/dashboard';
+    window.history.pushState({}, '', path);
+  };
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -139,7 +209,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       console.log('📡 Data recovery triggered from child component');
       setShowDataCorruptionDialog(true);
     };
-
+    
     window.addEventListener('trigger-data-recovery', handleDataRecoveryTrigger);
     
     return () => {
@@ -209,9 +279,9 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
                 storage.clearCurrentProject();
                 setSelectedProject(null);
               }
+              }
             }
-          }
-        } else {
+          } else {
           console.log('⚠️ Could not validate projects with backend');
         }
       } catch (error) {
@@ -274,7 +344,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
             },
           }
         );
-
+        
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
           console.error('❌ Failed to fetch project data:', errorData);
@@ -305,7 +375,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
             errorString.includes('Invalid UUID') ||
             errorString.includes('uuid') ||
             errorString.includes('UUID');
-            
+          
           if (isUUIDError) {
             console.error('🚨 UUID error detected, removing project:', selectedProject.id);
             storage.deleteProject(selectedProject.id);
@@ -345,21 +415,21 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
           };
           
           storage.saveProject(updatedProject);
-          setSelectedProject(updatedProject);
-          
+            setSelectedProject(updatedProject);
+            
           // Show success toast if status changed from processing to ready
           if (previousStatus === 'processing' && updatedProject.dataStatus === 'ready') {
             toast.success('Analysis Complete!', {
               description: 'Your brand analysis is ready. Dashboard has been updated.',
               duration: 5000,
-            });
+              });
+            }
           }
-        }
       } catch (error) {
         console.error('❌ Error fetching project data:', error);
       }
     };
-
+    
     // Only fetch if project has no data or is processing
     if (!selectedProject.data || selectedProject.dataStatus === 'processing') {
       fetchProjectData();
@@ -427,7 +497,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
           }),
         }
       );
-
+      
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
         console.error('❌ Refresh failed:', errorData);
@@ -527,11 +597,11 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
           },
         }
       );
-
+      
       if (!response.ok) {
         throw new Error('Failed to fetch projects from backend');
       }
-
+      
       const data = await response.json();
       const backendProjects = data.projects || [];
       
@@ -615,7 +685,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       {/* Sidebar */}
       <Sidebar
         activeItem={activeItem}
-        setActiveItem={setActiveItem}
+        setActiveItem={handleSetActiveItem}
         hoveredItem={hoveredItem}
         setHoveredItem={setHoveredItem}
         userEmail={userEmail}
@@ -644,14 +714,14 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
         {/* Main Content */}
         <MainContent
           activeItem={activeItem}
-          selectedProject={selectedProject}
+                selectedProject={selectedProject}
           onNavigate={onNavigate}
-          onDeleteProject={handleProjectDeleted}
-        />
-      </div>
+                onDeleteProject={handleProjectDeleted}
+              />
+          </div>
 
       {/* Feedback Dialog */}
-      <FeedbackDialog
+      <FeedbackDialog 
         open={showFeedbackDialog}
         onOpenChange={setShowFeedbackDialog}
       />
@@ -677,7 +747,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
             <AlertDialogCancel className="bg-card border-border hover:bg-secondary/80">
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={handleDataRecovery}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
