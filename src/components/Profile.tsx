@@ -105,9 +105,9 @@ export function Profile({ onNavigate }: ProfileProps) {
       }
 
       console.log('📡 Making profile update API call...');
-      // Hardcoded URL test
-      const endpointUrl = "https://vtnglubfoyvfwuxxbugs.supabase.co/functions/v1/make-server-cf9a9609/user/profile";
-      console.log('🔍 Hardcoded Endpoint URL:', endpointUrl);
+      // Hardcoded URL test - YENİ YAKLAŞIM
+      const endpointUrl = "https://vtnglubfoyvfwuxxbugs.supabase.co/functions/v1/make-server-cf9a9609/profile/update";
+      console.log('🔍 NEW Hardcoded Endpoint URL:', endpointUrl);
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
       

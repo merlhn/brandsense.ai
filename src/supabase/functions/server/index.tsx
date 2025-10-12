@@ -79,17 +79,18 @@ app.get("/", (c) => {
 app.use('*', logger(console.log));
 
 // ============================================
-// USER PROFILE ROUTE - MOVED TO TOP
+// USER PROFILE ROUTE - YENİ YAKLAŞIM
 // ============================================
 
 /**
- * POST /make-server-cf9a9609/user/profile
+ * POST /profile/update
  * Headers: Authorization: Bearer <access_token>
  * Body: { fullName, position, company }
  */
-app.post("/user/profile", async (c) => {
-  console.log('🔍 Profile endpoint hit!', c.req.method, c.req.url);
-  console.log('🔍 Headers:', c.req.header('Authorization') ? 'Present' : 'Missing');
+app.post("/profile/update", async (c) => {
+  console.log('🔍 NEW Profile endpoint hit!', c.req.method, c.req.url);
+  console.log('🔍 NEW Headers:', c.req.header('Authorization') ? 'Present' : 'Missing');
+  
   try {
     const authHeader = c.req.header('Authorization');
     const { error: authError, user } = await verifyAuth(authHeader);
