@@ -210,7 +210,7 @@ export function SignIn({ onNavigate }: SignInProps) {
         {/* Google Sign In - Disabled */}
         <Button 
           variant="outline" 
-          disabled={hasStaleData || true}
+          disabled={true}
           className="w-full h-11 bg-card border-border opacity-50 cursor-not-allowed"
         >
           <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
@@ -242,17 +242,17 @@ export function SignIn({ onNavigate }: SignInProps) {
         </div>
 
         {/* Email/Password Form - DISABLED if stale data detected */}
-        <div className={`space-y-4 ${hasStaleData ? 'opacity-50 pointer-events-none' : ''}`}>
+        <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email" className="text-foreground">Email</Label>
             <Input 
               id="email" 
               type="email" 
-              placeholder={hasStaleData ? "Clear data first" : "you@company.com"}
+              placeholder="you@company.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyPress={handleKeyPress}
-              disabled={isLoading || hasStaleData}
+              disabled={isLoading}
               className="h-11 bg-card border-border focus:border-primary transition-colors"
             />
           </div>
@@ -262,7 +262,7 @@ export function SignIn({ onNavigate }: SignInProps) {
               <Label htmlFor="password" className="text-foreground">Password</Label>
               <button 
                 onClick={() => onNavigate?.('forgot')}
-                disabled={isLoading || hasStaleData}
+                disabled={isLoading}
                 className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
               >
                 Forgot?
@@ -271,18 +271,18 @@ export function SignIn({ onNavigate }: SignInProps) {
             <Input 
               id="password" 
               type="password" 
-              placeholder={hasStaleData ? "Clear data first" : "••••••••"}
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onKeyPress={handleKeyPress}
-              disabled={isLoading || hasStaleData}
+              disabled={isLoading}
               className="h-11 bg-card border-border focus:border-primary transition-colors"
             />
           </div>
 
           <Button 
             onClick={handleSubmit}
-            disabled={!email || !password || isLoading || hasStaleData}
+            disabled={!email || !password || isLoading}
             className="w-full h-11 mt-6 bg-primary hover:bg-primary/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
@@ -290,8 +290,6 @@ export function SignIn({ onNavigate }: SignInProps) {
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Signing In...
               </>
-            ) : hasStaleData ? (
-              '🔒 Clear Data to Sign In'
             ) : (
               'Sign In'
             )}
@@ -300,23 +298,19 @@ export function SignIn({ onNavigate }: SignInProps) {
 
         <div className="text-center mt-8 pt-6 border-t border-border">
           <span className="text-muted-foreground">
-            {hasStaleData ? 'After clearing data: ' : 'Don\'t have an account? '}
+            Don't have an account? 
           </span>
           <button 
             onClick={() => onNavigate?.('signup')}
             disabled={isLoading}
-            className={`transition-colors disabled:opacity-50 ${
-              hasStaleData 
-                ? 'text-primary font-medium hover:text-primary/90' 
-                : 'text-foreground hover:text-primary'
-            }`}
+            className="text-foreground hover:text-primary transition-colors disabled:opacity-50"
           >
-            {hasStaleData ? '→ Go to Sign Up' : 'Sign Up'}
+            Sign Up
           </button>
         </div>
 
-        {/* Debug: Clear Data Button - More subtle when no stale data */}
-        {!hasStaleData && (
+        {/* Debug: Clear Data Button */}
+        {(
           <div className="text-center mt-4">
             <button 
               onClick={() => {
