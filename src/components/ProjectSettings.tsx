@@ -167,9 +167,42 @@ export function ProjectSettings({ onNavigate, onDeleteProject, selectedProject }
         return;
       }
 
-      // Success - update localStorage
-      const updatedProject = { ...selectedProject, ...data.project };
-      storage.saveProject(updatedProject);
+      // Success - sync all projects from backend
+      console.log('🔄 Syncing all projects from backend after update...');
+      
+      try {
+        // Fetch all projects from backend
+        const projectsResponse = await fetch(
+          `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/projects`,
+          {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        if (projectsResponse.ok) {
+          const projectsData = await projectsResponse.json();
+          const backendProjects = projectsData.projects || [];
+          
+          console.log(`✅ Fetched ${backendProjects.length} projects from backend`);
+          
+          // Sync storage with backend - backend is source of truth
+          storage.syncProjectsFromBackend(backendProjects);
+          
+          console.log('✅ Projects synced successfully');
+        } else {
+          console.warn('⚠️ Failed to fetch updated projects, using local update');
+          // Fallback: update localStorage only
+          const updatedProject = { ...selectedProject, ...data.project };
+          storage.saveProject(updatedProject);
+        }
+      } catch (syncError) {
+        console.error('❌ Failed to sync projects from backend:', syncError);
+        // Fallback: update localStorage only
+        const updatedProject = { ...selectedProject, ...data.project };
+        storage.saveProject(updatedProject);
+      }
 
       setIsSaving(false);
       setIsEditing(false);

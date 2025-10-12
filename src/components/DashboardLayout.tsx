@@ -134,6 +134,36 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     };
   }, []);
 
+  // Projects değişikliklerini dinle
+  useEffect(() => {
+    const handleProjectsChange = () => {
+      const allProjects = storage.getAllProjects();
+      const currentProject = storage.getCurrentProject();
+      
+      console.log('🔄 Projects updated in storage, refreshing dashboard...');
+      console.log(`   Total projects: ${allProjects.length}`);
+      console.log(`   Current project: ${currentProject?.name || 'None'}`);
+      
+      // Update projects state
+      setProjects(allProjects);
+      
+      // Update selected project if it changed
+      if (currentProject && currentProject.id !== selectedProject?.id) {
+        setSelectedProject(currentProject);
+      }
+    };
+
+    // Storage değişikliklerini dinle
+    window.addEventListener('storage', handleProjectsChange);
+    
+    // Component mount olduğunda da kontrol et
+    handleProjectsChange();
+
+    return () => {
+      window.removeEventListener('storage', handleProjectsChange);
+    };
+  }, [selectedProject]);
+
   // Listen for data recovery trigger from child components
   useEffect(() => {
     const handleDataRecoveryTrigger = () => {
