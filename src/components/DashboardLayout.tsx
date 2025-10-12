@@ -35,54 +35,44 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
   useEffect(() => {
     const handleDashboardRoute = () => {
       const path = window.location.pathname;
-      console.log('🔍 DashboardLayout - URL path:', path);
-      console.log('🔍 DashboardLayout - Current activeItem:', activeItem);
       
       // Dashboard sub-routes
       if (path === '/dashboard' || path === '/dashboard/') {
-        console.log('✅ Setting activeItem to identity');
         setActiveItem('identity');
         return;
       }
       
       if (path === '/dashboard/identity') {
-        console.log('✅ Setting activeItem to identity');
         setActiveItem('identity');
         return;
       }
       
       if (path === '/dashboard/sentiment') {
-        console.log('✅ Setting activeItem to sentiment');
         setActiveItem('sentiment');
         return;
       }
       
       if (path === '/dashboard/keyword') {
-        console.log('✅ Setting activeItem to keyword');
         setActiveItem('keyword');
         return;
       }
       
       if (path === '/dashboard/profile') {
-        console.log('✅ Setting activeItem to profile');
         setActiveItem('profile');
         return;
       }
       
       if (path === '/dashboard/account-settings') {
-        console.log('✅ Setting activeItem to account-settings');
         setActiveItem('account-settings');
         return;
       }
       
       if (path === '/dashboard/project-settings') {
-        console.log('✅ Setting activeItem to project-settings');
         setActiveItem('project-settings');
         return;
       }
       
       // Default to identity if no match
-      console.log('⚠️ No route match, defaulting to identity');
       setActiveItem('identity');
     };
     
@@ -91,7 +81,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     // Listen for browser back/forward
     window.addEventListener('popstate', handleDashboardRoute);
     return () => window.removeEventListener('popstate', handleDashboardRoute);
-  }, [activeItem]);
+  }, []);
 
   // Update URL when activeItem changes
   const handleSetActiveItem = (item: string) => {
@@ -690,6 +680,33 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
   };
 
 
+  // Handle case when no project is selected
+  if (!selectedProject) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+          </div>
+          <h3 className="text-foreground tracking-tight mb-2 text-[18px] font-medium">
+            No Project Selected
+          </h3>
+          <p className="text-muted-foreground tracking-tight text-[15px] mb-6">
+            Please select a project to view the dashboard.
+          </p>
+          <button
+            onClick={() => onNavigate?.(SCREENS.ONBOARDING_BRAND)}
+            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            Create Project
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen bg-background flex">
       {/* Sidebar */}
@@ -724,11 +741,11 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
         {/* Main Content */}
         <MainContent
           activeItem={activeItem}
-                selectedProject={selectedProject}
+          selectedProject={selectedProject}
           onNavigate={onNavigate}
-                onDeleteProject={handleProjectDeleted}
-              />
-          </div>
+          onDeleteProject={handleProjectDeleted}
+        />
+      </div>
 
       {/* Feedback Dialog */}
       <FeedbackDialog 
