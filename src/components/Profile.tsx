@@ -65,6 +65,7 @@ export function Profile({ onNavigate }: ProfileProps) {
     try {
       const accessToken = storage.getAccessToken();
       console.log('🔍 Profile Update - Access Token:', accessToken ? 'Present' : 'Missing');
+      console.log('🔍 Profile Update - Access Token Value:', accessToken);
       console.log('🔍 Profile Update - Data to save:', { fullName, position, company });
       
       // Check backend health first
