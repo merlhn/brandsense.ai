@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Lock, Check, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion } from "motion/react";
+import { User, Mail, Briefcase, Lock, Check, X } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -13,18 +14,129 @@ interface ProfileProps {
 }
 
 export function Profile({ onNavigate }: ProfileProps) {
+  // Personal Information State
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [position, setPosition] = useState("");
+  
+  // Store original values for cancel functionality
+  const [originalFullName, setOriginalFullName] = useState("");
+  const [originalPosition, setOriginalPosition] = useState("");
 
   // Password State
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-
   // UI State
+  const [isEditingInfo, setIsEditingInfo] = useState(false);
   const [isEditingPassword, setIsEditingPassword] = useState(false);
+  const [isSavingInfo, setIsSavingInfo] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
+  // Load user data from storage on mount
+  useEffect(() => {
+    const storedEmail = storage.getUserEmail();
+    const storedFullName = storage.getUserFullName();
+    const storedPosition = localStorage.getItem('user_position');
 
+    setEmail(storedEmail || '');
+    setFullName(storedFullName || '');
+    setPosition(storedPosition || '');
+    
+    // Store original values
+    setOriginalFullName(storedFullName || '');
+    setOriginalPosition(storedPosition || '');
+    
+    console.log('📧 Profile loaded:', { email: storedEmail, fullName: storedFullName });
+  }, []);
+
+  const handleSaveInfo = async () => {
+    console.log('🚀 Profile Update - Starting save process');
+    setIsSavingInfo(true);
+    
+    try {
+      const accessToken = storage.getAccessToken();
+      console.log('🔍 Profile Update - Access Token:', accessToken ? 'Present' : 'Missing');
+      console.log('🔍 Profile Update - Data to save:', { fullName, position });
+      
+      if (!accessToken) {
+        console.log('❌ No access token found');
+        toast.error("Session expired. Please sign in again.");
+        setIsSavingInfo(false);
+        setTimeout(() => {
+          window.location.href = '/signin';
+        }, 2000);
+        return;
+      }
+
+      console.log('📡 Making profile update API call...');
+      const endpointUrl = "https://vtnglubfoyvfwuxxbugs.supabase.co/functions/v1/make-server-cf9a9609/user/profile-update";
+      console.log('🔍 Endpoint URL:', endpointUrl);
+      
+      const response = await fetch(endpointUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          fullName: fullName.trim(),
+          position: position.trim(),
+        }),
+      });
+      
+      console.log('📡 Profile update API call completed');
+      const data = await response.json();
+      console.log('📡 Profile Update Response:', { status: response.status, data });
+
+      if (!response.ok) {
+        console.log('❌ Profile update failed:', data);
+        
+        if (response.status === 401) {
+          toast.error("Session expired. Redirecting to sign in...");
+          storage.clearAll();
+          setTimeout(() => {
+            window.location.href = '/signin';
+          }, 2000);
+          setIsSavingInfo(false);
+          return;
+        }
+        
+        toast.error(data.error || 'Failed to update profile');
+        setIsSavingInfo(false);
+        return;
+      }
+
+      console.log('✅ Profile update successful:', data);
+
+      // Success - update localStorage
+      storage.setUserFullName(fullName.trim());
+      localStorage.setItem('user_position', position.trim());
+      
+      // Update original values
+      setOriginalFullName(fullName.trim());
+      setOriginalPosition(position.trim());
+      
+      setIsSavingInfo(false);
+      setIsEditingInfo(false);
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 3000);
+      
+    } catch (error) {
+      console.error('Profile update error:', error);
+      toast.error('Failed to update profile. Please try again.');
+      setIsSavingInfo(false);
+    }
+  };
+
+  const handleCancelInfo = () => {
+    setIsEditingInfo(false);
+    // Reset to original values
+    setFullName(originalFullName);
+    setPosition(originalPosition);
+  };
 
   const handleSavePassword = async () => {
     if (newPassword !== confirmPassword) {
@@ -104,12 +216,115 @@ export function Profile({ onNavigate }: ProfileProps) {
                 Manage your profile information and preferences
               </p>
             </div>
+            {showSuccessMessage && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: -10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-success/10 border border-success/20"
+              >
+                <Check className="w-4 h-4 text-success" />
+                <span className="text-success tracking-tight">Changes saved successfully</span>
+              </motion.div>
+            )}
           </div>
         </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-8 py-8">
         <div className="space-y-8">
+          {/* Personal Information */}
+          <section className="bg-card border border-border rounded-lg p-6">
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <h2 className="text-foreground tracking-tight mb-1">Personal Information</h2>
+                <p className="text-muted-foreground tracking-tight">
+                  Update your personal details
+                </p>
+              </div>
+              {!isEditingInfo ? (
+                <Button
+                  onClick={() => setIsEditingInfo(true)}
+                  variant="outline"
+                  className="h-9 px-4 bg-card border-border hover:bg-secondary/80"
+                >
+                  Edit
+                </Button>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={handleCancelInfo}
+                    variant="outline"
+                    className="h-9 px-4 bg-card border-border hover:bg-secondary/80"
+                  >
+                    <X className="w-4 h-4 mr-1.5" />
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleSaveInfo}
+                    disabled={isSavingInfo}
+                    className="h-9 px-4 bg-primary hover:bg-primary/90"
+                  >
+                    {isSavingInfo ? (
+                      "Saving..."
+                    ) : (
+                      <>
+                        <Check className="w-4 h-4 mr-1.5" />
+                        Save
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Form Fields */}
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="fullName" className="text-foreground">
+                  <User className="w-4 h-4 inline mr-2" />
+                  Full Name
+                </Label>
+                <Input
+                  id="fullName"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  disabled={!isEditingInfo}
+                  className="h-11 bg-input-background border-border disabled:opacity-100 disabled:cursor-default"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="position" className="text-foreground">
+                  <Briefcase className="w-4 h-4 inline mr-2" />
+                  Position
+                </Label>
+                <Input
+                  id="position"
+                  value={position}
+                  onChange={(e) => setPosition(e.target.value)}
+                  disabled={!isEditingInfo}
+                  className="h-11 bg-input-background border-border disabled:opacity-100 disabled:cursor-default"
+                />
+              </div>
+
+              <div className="space-y-2 col-span-2">
+                <Label htmlFor="email" className="text-foreground">
+                  <Mail className="w-4 h-4 inline mr-2" />
+                  Email Address
+                </Label>
+                <Input
+                  id="email"
+                  value={email}
+                  disabled
+                  className="h-11 bg-input-background border-border opacity-60 cursor-not-allowed"
+                />
+                <p className="text-muted-foreground tracking-tight">
+                  Email address cannot be changed
+                </p>
+              </div>
+            </div>
+          </section>
 
           {/* Password Change */}
           <section className="bg-card border border-border rounded-lg p-6">

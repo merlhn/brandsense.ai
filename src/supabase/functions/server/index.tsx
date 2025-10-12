@@ -78,6 +78,62 @@ app.get("/", (c) => {
 // Enable logger
 app.use('*', logger(console.log));
 
+// ============================================
+// USER PROFILE UPDATE ROUTE
+// ============================================
+
+/**
+ * POST /user/profile-update
+ * Headers: Authorization: Bearer <access_token>
+ * Body: { fullName, position }
+ */
+app.post("/user/profile-update", async (c) => {
+  console.log('🔍 Profile Update Endpoint Hit!', c.req.method, c.req.url);
+  console.log('🔍 Headers:', c.req.header('Authorization') ? 'Present' : 'Missing');
+
+  try {
+    const authHeader = c.req.header('Authorization');
+    const { error: authError, user } = await verifyAuth(authHeader);
+
+    if (authError || !user) {
+      console.error('❌ Authentication Error:', authError || 'Unauthorized');
+      return c.json({ error: authError?.message || 'Unauthorized' }, 401);
+    }
+
+    const body = await c.req.json();
+    const { fullName, position } = body;
+
+    // Validate required fields
+    if (!fullName) {
+      console.error('❌ Validation Error: Full name is required');
+      return c.json({ error: 'Full name is required' }, 400);
+    }
+
+    // Update user metadata in Supabase
+    const { data, error: updateError } = await supabase.auth.admin.updateUserById(
+      user.id,
+      {
+        user_metadata: {
+          fullName: fullName,
+          position: position,
+        },
+      }
+    );
+
+    if (updateError) {
+      console.error('❌ Supabase Update Error:', updateError.message);
+      return c.json({ error: updateError.message }, 500);
+    }
+
+    console.log('✅ Profile updated successfully for user:', user.id);
+    return c.json({ message: 'Profile updated successfully', user: data.user });
+
+  } catch (error: any) {
+    console.error('❌ Server Error:', error.message);
+    return c.json({ error: 'Internal Server Error' }, 500);
+  }
+});
+
 
 // ============================================
 // UTILITIES
