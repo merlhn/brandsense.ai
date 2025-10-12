@@ -19,20 +19,6 @@ export function SignIn({ onNavigate }: SignInProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [hasStaleData, setHasStaleData] = useState(false);
-
-  // Check for stale data on mount
-  useEffect(() => {
-    const projects = storage.getAllProjects();
-    const token = storage.getAccessToken();
-    
-    if (projects.length > 0 || token) {
-      setHasStaleData(true);
-      logger.warning('STALE DATA DETECTED ON SIGN IN PAGE');
-      logger.warning('You have old data in storage that may cause errors.');
-      logger.warning('Click "Clear All Data" below before attempting to sign in.');
-    }
-  }, []);
 
   const handleSubmit = async () => {
     if (!email || !password) {
@@ -199,48 +185,9 @@ export function SignIn({ onNavigate }: SignInProps) {
         </p>
       </div>
 
-      {/* Stale Data Warning - HIGH PRIORITY */}
-      {hasStaleData && (
-        <div className="mb-6 p-5 border-2 border-destructive rounded-lg bg-destructive/20 space-y-3">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="w-6 h-6 text-destructive mt-0.5 shrink-0" />
-            <div className="flex-1 space-y-3">
-              <div>
-                <p className="text-destructive font-medium text-[15px] mb-2">⚠️ OLD DATA DETECTED</p>
-                <p className="text-destructive/90 text-[14px]">
-                  Your browser has cached data from a previous session. This will cause sign in errors.
-                </p>
-              </div>
-              
-              <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 space-y-2">
-                <p className="text-destructive font-medium text-[13px]">Required Action:</p>
-                <ol className="list-decimal list-inside space-y-1 text-[13px] text-destructive/80">
-                  <li>Click "Clear All Data" button below</li>
-                  <li>Page will reload automatically</li>
-                  <li>Click "Sign Up" to create a NEW account</li>
-                  <li>Do NOT use Sign In unless you created an account today</li>
-                </ol>
-              </div>
-
-              <button
-                onClick={() => {
-                  if (confirm('This will clear all local data. Continue?')) {
-                    logger.cleanup('Clearing all storage data...');
-                    storage.clearAll();
-                    window.location.reload();
-                  }
-                }}
-                className="w-full px-4 py-3 rounded-lg bg-destructive text-white hover:bg-destructive/90 transition-all duration-150 font-medium text-[14px]"
-              >
-                🧹 Clear All Data & Reload
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Error Message */}
-      {error && !hasStaleData && (
+      {error && (
         <div className="mb-6 p-4 border border-destructive/50 rounded-lg bg-destructive/10 space-y-3">
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
