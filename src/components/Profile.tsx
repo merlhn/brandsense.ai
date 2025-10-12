@@ -97,6 +97,8 @@ export function Profile({ onNavigate }: ProfileProps) {
         return;
       }
 
+      console.log('✅ Profile update successful:', data);
+
       // Success - update localStorage
       storage.setUserFullName(fullName.trim());
       localStorage.setItem('user_position', position.trim());
