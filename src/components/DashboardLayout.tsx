@@ -680,8 +680,15 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
   };
 
 
+  // Debug logs for troubleshooting
+  console.log('🔍 DashboardLayout - selectedProject:', selectedProject ? 'Present' : 'Missing');
+  console.log('🔍 DashboardLayout - selectedProject ID:', selectedProject?.id);
+  console.log('🔍 DashboardLayout - activeItem:', activeItem);
+  console.log('🔍 DashboardLayout - URL path:', window.location.pathname);
+
   // Handle case when no project is selected
   if (!selectedProject) {
+    console.log('❌ DashboardLayout - No project selected, showing fallback');
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center max-w-md">

@@ -19,7 +19,12 @@ export function MainContent({
   onNavigate,
   onDeleteProject
 }: MainContentProps) {
+  console.log('🔍 MainContent - activeItem:', activeItem);
+  console.log('🔍 MainContent - selectedProject:', selectedProject ? 'Present' : 'Missing');
+  console.log('🔍 MainContent - selectedProject ID:', selectedProject?.id);
+
   const renderContent = () => {
+    console.log('🔍 MainContent - Rendering content for activeItem:', activeItem);
     switch (activeItem) {
       case 'identity':
         return <BrandIdentity project={selectedProject} />;
@@ -32,13 +37,35 @@ export function MainContent({
       case 'account-settings':
         return <AccountSettings onNavigate={onNavigate} />;
       case 'project-settings':
-        return (
-          <ProjectSettings 
-            onNavigate={onNavigate} 
-            onDeleteProject={onDeleteProject}
-            selectedProject={selectedProject}
-          />
-        );
+        console.log('🔍 MainContent - Rendering ProjectSettings');
+        try {
+          return (
+            <ProjectSettings 
+              onNavigate={onNavigate} 
+              onDeleteProject={onDeleteProject}
+              selectedProject={selectedProject}
+            />
+          );
+        } catch (error) {
+          console.error('❌ MainContent - Error rendering ProjectSettings:', error);
+          return (
+            <div className="min-h-screen bg-background flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-6xl mb-4">⚠️</div>
+                <h1 className="text-2xl font-bold text-foreground mb-2">Error Loading Project Settings</h1>
+                <p className="text-muted-foreground mb-4">
+                  There was an error loading the project settings page.
+                </p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                >
+                  Reload Page
+                </button>
+              </div>
+            </div>
+          );
+        }
       default:
         return <BrandIdentity project={selectedProject} />;
     }
