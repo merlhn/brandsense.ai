@@ -78,7 +78,7 @@ app.get("/", (c) => {
 // Enable logger
 app.use('*', logger(console.log));
 
-// Enable CORS for all routes and methods
+// Enable CORS for all routes and methods - MOVED TO TOP
 app.use(
   "/*",
   cors({
