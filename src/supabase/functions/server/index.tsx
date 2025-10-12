@@ -78,8 +78,6 @@ app.get("/", (c) => {
 // Enable logger
 app.use('*', logger(console.log));
 
-// CORS middleware moved to bottom - after all routes
-
 // ============================================
 // USER PROFILE ROUTE - MOVED TO TOP
 // ============================================
