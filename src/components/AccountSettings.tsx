@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { Bell, Shield, Trash2, Key, Check, Mail } from "lucide-react";
+import { Trash2, Key, Check } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -22,10 +22,6 @@ interface AccountSettingsProps {
 }
 
 export function AccountSettings({ onNavigate }: AccountSettingsProps) {
-  // Preferences State
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [marketingEmails, setMarketingEmails] = useState(false);
-  const [weeklyReports, setWeeklyReports] = useState(true);
 
   // UI State
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -33,12 +29,6 @@ export function AccountSettings({ onNavigate }: AccountSettingsProps) {
   // Delete confirmation state
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
-  const handleSavePreferences = async () => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3000);
-  };
 
   const handleDeleteAccount = () => {
     // Handle account deletion
@@ -90,68 +80,6 @@ export function AccountSettings({ onNavigate }: AccountSettingsProps) {
               </p>
             </div>
 
-            <div className="space-y-4">
-              <div className="flex items-start justify-between py-3 border-b border-border">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Bell className="w-4 h-4 text-muted-foreground" />
-                    <h3 className="text-foreground tracking-tight">Email Notifications</h3>
-                  </div>
-                  <p className="text-muted-foreground tracking-tight">
-                    Receive notifications about your projects and reports
-                  </p>
-                </div>
-                <Switch
-                  checked={emailNotifications}
-                  onCheckedChange={setEmailNotifications}
-                  className="ml-4"
-                />
-              </div>
-
-              <div className="flex items-start justify-between py-3 border-b border-border">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Mail className="w-4 h-4 text-muted-foreground" />
-                    <h3 className="text-foreground tracking-tight">Weekly Reports</h3>
-                  </div>
-                  <p className="text-muted-foreground tracking-tight">
-                    Get a weekly summary of your brand monitoring data
-                  </p>
-                </div>
-                <Switch
-                  checked={weeklyReports}
-                  onCheckedChange={setWeeklyReports}
-                  className="ml-4"
-                />
-              </div>
-
-              <div className="flex items-start justify-between py-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Mail className="w-4 h-4 text-muted-foreground" />
-                    <h3 className="text-foreground tracking-tight">Marketing Emails</h3>
-                  </div>
-                  <p className="text-muted-foreground tracking-tight">
-                    Receive updates about new features and tips
-                  </p>
-                </div>
-                <Switch
-                  checked={marketingEmails}
-                  onCheckedChange={setMarketingEmails}
-                  className="ml-4"
-                />
-              </div>
-
-              <div className="flex justify-end pt-2">
-                <Button
-                  onClick={handleSavePreferences}
-                  className="h-9 px-4 bg-primary hover:bg-primary/90"
-                >
-                  <Check className="w-4 h-4 mr-1.5" />
-                  Save Preferences
-                </Button>
-              </div>
-            </div>
           </section>
 
           {/* Security */}
@@ -182,23 +110,6 @@ export function AccountSettings({ onNavigate }: AccountSettingsProps) {
                 </Button>
               </div>
 
-              <div className="flex items-start justify-between border border-border rounded-lg p-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Shield className="w-4 h-4 text-muted-foreground" />
-                    <h3 className="text-foreground tracking-tight">Two-Factor Authentication</h3>
-                  </div>
-                  <p className="text-muted-foreground tracking-tight">
-                    Add an extra layer of security to your account
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  className="ml-4 h-9 px-4 bg-card border-border hover:bg-secondary/80"
-                >
-                  Enable 2FA
-                </Button>
-              </div>
             </div>
           </section>
 

@@ -5,7 +5,6 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
-import { Switch } from "./ui/switch";
 import { storage } from "../lib/storage";
 
 interface ProfileProps {
@@ -29,8 +28,6 @@ export function Profile({ onNavigate }: ProfileProps) {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // Settings State
-  const [emailNotifications, setEmailNotifications] = useState(true);
 
   // UI State
   const [isEditingInfo, setIsEditingInfo] = useState(false);
@@ -353,27 +350,6 @@ export function Profile({ onNavigate }: ProfileProps) {
               </p>
             </div>
 
-            <div className="space-y-6">
-              {/* Email Notifications */}
-              <div>
-                <h3 className="text-foreground tracking-tight mb-4">Email Notifications</h3>
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <Label htmlFor="emailNotifications" className="text-foreground cursor-pointer">
-                      Marketing emails
-                    </Label>
-                    <p className="text-muted-foreground tracking-tight mt-1">
-                      Receive emails about new features and updates
-                    </p>
-                  </div>
-                  <Switch
-                    id="emailNotifications"
-                    checked={emailNotifications}
-                    onCheckedChange={setEmailNotifications}
-                  />
-                </div>
-              </div>
-            </div>
           </section>
         </div>
       </div>

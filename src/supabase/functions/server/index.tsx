@@ -1292,7 +1292,6 @@ app.post('/make-server-cf9a9609/feedback', async (c) => {
       }
     } else {
       console.log('⚠️ RESEND_API_KEY not configured - email not sent');
-      console.log('💡 To enable email notifications, set RESEND_API_KEY environment variable');
     }
 
     // Store feedback in KV store for backup
