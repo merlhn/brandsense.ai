@@ -1,41 +1,16 @@
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { 
-  BarChart3, 
-  MessageSquare,
-  Settings,
-  User,
-  ChevronRight,
-  Binoculars,
-  RefreshCw,
-  ChevronDown,
-  LogOut,
-  Fingerprint,
-  ArrowRight,
-  X,
-  Sparkles
-} from "lucide-react";
 import { toast } from "sonner@2.0.3";
 import { refreshProjectData } from "../lib/api";
-import { Separator } from "./ui/separator";
-import { KeywordAnalysis } from "./KeywordAnalysis";
-import { BrandIdentity } from "./BrandIdentity";
-import { SentimentAnalysis } from "./SentimentAnalysis";
-import { Profile } from "./Profile";
-import { ProjectSettings } from "./ProjectSettings";
-import { AccountSettings } from "./AccountSettings";
 import { FeedbackDialog } from "./FeedbackDialog";
+import { Sidebar } from "./layout/Sidebar";
+import { Header } from "./layout/Header";
+import { MainContent } from "./layout/MainContent";
 import { storage } from "../lib/storage";
 import { projectId, publicAnonKey } from "../utils/supabase/info";
 import { logger } from "../lib/logger";
 import { SCREENS } from "../lib/constants";
 import { Project } from "../lib/types";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,21 +26,6 @@ import { Toaster } from "./ui/sonner";
 interface DashboardLayoutProps {
   onNavigate?: (screen: string) => void;
 }
-
-const dashboards = [
-  { id: "identity", label: "Brand Identity", icon: Fingerprint },
-  { id: "sentiment", label: "Sentiment Analysis", icon: MessageSquare },
-  { id: "keyword", label: "Keyword Analysis", icon: BarChart3 },
-];
-
-const accountItems = [
-  { id: "profile", label: "Profile", icon: User },
-  { id: "account-settings", label: "Settings", icon: Settings },
-];
-
-const projectItems = [
-  { id: "project-settings", label: "Project Settings", icon: Settings },
-];
 
 export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
   const [activeItem, setActiveItem] = useState("identity");
@@ -171,7 +131,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       console.log('📡 Data recovery triggered from child component');
       setShowDataCorruptionDialog(true);
     };
-    
+
     window.addEventListener('trigger-data-recovery', handleDataRecoveryTrigger);
     
     return () => {
@@ -210,55 +170,53 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
         if (response.ok) {
           const data = await response.json();
           const backendProjects = data.projects || [];
-          const backendProjectIds = new Set(backendProjects.map((p: any) => p.id));
           
-          // Find projects that exist in localStorage but not in backend
-          const invalidProjects = localProjects.filter(p => !backendProjectIds.has(p.id));
+          console.log(`✅ Backend has ${backendProjects.length} projects`);
           
-          if (invalidProjects.length > 0) {
-            console.log(`🧹 Found ${invalidProjects.length} invalid projects, cleaning up...`);
-            invalidProjects.forEach(p => {
-              console.log(`  - Removing: ${p.name} (${p.id})`);
-              storage.deleteProject(p.id);
+          // Check if any local projects are missing from backend
+          const localProjectIds = localProjects.map(p => p.id);
+          const backendProjectIds = backendProjects.map((p: any) => p.id);
+          
+          const missingProjects = localProjectIds.filter(id => !backendProjectIds.includes(id));
+          
+          if (missingProjects.length > 0) {
+            console.log(`⚠️ Found ${missingProjects.length} local projects not in backend:`, missingProjects);
+            
+            // Remove missing projects from local storage
+            missingProjects.forEach(id => {
+              storage.deleteProject(id);
+              console.log(`🗑️ Removed missing project: ${id}`);
             });
             
-            // Refresh project list
+            // Update projects state
             const updatedProjects = storage.getAllProjects();
             setProjects(updatedProjects);
             
             // Update selected project if it was deleted
-            if (selectedProject && invalidProjects.some(p => p.id === selectedProject.id)) {
+            if (selectedProject && missingProjects.includes(selectedProject.id)) {
               if (updatedProjects.length > 0) {
-                setSelectedProject(updatedProjects[0]);
                 storage.setCurrentProject(updatedProjects[0]);
+                setSelectedProject(updatedProjects[0]);
               } else {
-                setSelectedProject(null);
                 storage.clearCurrentProject();
+                setSelectedProject(null);
               }
             }
-          } else {
-            console.log('✅ All local projects are valid');
           }
+        } else {
+          console.log('⚠️ Could not validate projects with backend');
         }
       } catch (error) {
-        console.error('⚠️ Failed to validate projects:', error);
+        console.log('⚠️ Error validating projects:', error);
       }
     };
 
     validateProjects();
-  }, []); // Run once on mount
-  
-  // Persist selected project when it changes
-  useEffect(() => {
-    if (selectedProject) {
-      storage.setCurrentProject(selectedProject);
-    }
-  }, [selectedProject]);
+  }, []);
 
-  // Auto-dismiss onboarding banner when data becomes ready
+  // Auto-dismiss onboarding banner after 2 seconds if data is ready
   useEffect(() => {
     if (selectedProject?.dataStatus === 'ready' && showOnboardingBanner) {
-      // Wait a bit to let the user see the success state
       const timer = setTimeout(() => {
         dismissOnboardingBanner();
       }, 2000);
@@ -274,14 +232,17 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     if (!storage.isValidUUID(selectedProject.id)) {
       console.error('🚨 Selected project has invalid UUID:', selectedProject.id);
       storage.deleteProject(selectedProject.id);
+      
+      // Update projects state
       const updatedProjects = storage.getAllProjects();
       setProjects(updatedProjects);
+      
       if (updatedProjects.length > 0) {
-        setSelectedProject(updatedProjects[0]);
         storage.setCurrentProject(updatedProjects[0]);
+        setSelectedProject(updatedProjects[0]);
       } else {
-        setSelectedProject(null);
         storage.clearCurrentProject();
+        setSelectedProject(null);
       }
       return;
     }
@@ -305,37 +266,26 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
             },
           }
         );
-        
+
         if (!response.ok) {
-          let errorData: any = {};
-          try {
-            errorData = await response.json();
-          } catch (e) {
-            // Response is not JSON
-            errorData = { error: response.statusText || 'Network error' };
-          }
-          console.error('❌ Failed to fetch project data:', response.status, errorData);
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+          console.error('❌ Failed to fetch project data:', errorData);
           
-          // Handle 404 - Project not found in backend
+          // Check if it's a 404 (project not found)
           if (response.status === 404) {
-            console.log('🧹 Project not found in backend, removing from localStorage:', selectedProject.id);
-            toast.error('Project Not Found', {
-              description: 'This project no longer exists. It has been removed.'
-            });
-            
+            console.log('🗑️ Project not found in backend, removing from local storage');
             storage.deleteProject(selectedProject.id);
             
-            // Reload projects
+            // Update projects state
             const updatedProjects = storage.getAllProjects();
             setProjects(updatedProjects);
             
-            // Select first valid project
             if (updatedProjects.length > 0) {
-              setSelectedProject(updatedProjects[0]);
               storage.setCurrentProject(updatedProjects[0]);
+              setSelectedProject(updatedProjects[0]);
             } else {
-              setSelectedProject(null);
               storage.clearCurrentProject();
+              setSelectedProject(null);
             }
             return;
           }
@@ -343,31 +293,25 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
           // Check if UUID error
           const errorString = JSON.stringify(errorData);
           const isUUIDError = 
-            errorData.details?.includes('uuid') || 
-            errorData.details?.includes('UUID') ||
-            errorData.details?.includes('22P02') ||
-            errorData.error?.includes('uuid') ||
-            errorData.error?.includes('UUID') ||
-            errorData.error?.includes('22P02') ||
+            errorString.includes('invalid input syntax for type uuid') ||
+            errorString.includes('Invalid UUID') ||
             errorString.includes('uuid') ||
-            errorString.includes('UUID') ||
-            errorString.includes('22P02');
-          
+            errorString.includes('UUID');
+            
           if (isUUIDError) {
-            console.log('🧹 Removing legacy project with invalid UUID:', selectedProject.id);
+            console.error('🚨 UUID error detected, removing project:', selectedProject.id);
             storage.deleteProject(selectedProject.id);
             
-            // Reload projects
+            // Update projects state
             const updatedProjects = storage.getAllProjects();
             setProjects(updatedProjects);
             
-            // Select first valid project if available
             if (updatedProjects.length > 0) {
-              setSelectedProject(updatedProjects[0]);
               storage.setCurrentProject(updatedProjects[0]);
+              setSelectedProject(updatedProjects[0]);
             } else {
-              setSelectedProject(null);
               storage.clearCurrentProject();
+              setSelectedProject(null);
             }
           }
           return;
@@ -377,7 +321,6 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
         let data;
         try {
           data = await response.json();
-          console.log('✅ Project data fetched successfully:', data);
         } catch (e) {
           console.error('❌ Failed to parse project data as JSON:', e);
           return;
@@ -386,48 +329,43 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
         // Update local storage with backend data
         if (data.data) {
           const previousStatus = selectedProject.dataStatus;
+          const updatedProject = {
+            ...selectedProject,
+            data: data.data,
+            dataStatus: data.data_status || 'ready',
+            lastRefreshAt: data.last_refreshed_at || new Date().toISOString(),
+          };
           
-          storage.updateProjectData(selectedProject.id, data.data);
+          storage.saveProject(updatedProject);
+          setSelectedProject(updatedProject);
           
-          // Update project status
-          if (data.project.data_status) {
-            storage.updateProjectStatus(selectedProject.id, data.project.data_status);
-          }
-          
-          // Refresh selected project
-          const updatedProject = storage.getProject(selectedProject.id);
-          if (updatedProject) {
-            setSelectedProject(updatedProject);
-            
-            // Show success toast when status changes from processing to ready
-            if (previousStatus === 'processing' && data.project.data_status === 'ready') {
-              console.log('✅ Analysis complete! Data is ready.');
-              toast.success('Analysis Complete', {
-                description: `${selectedProject.name} brand data is now ready!`
-              });
-            }
+          // Show success toast if status changed from processing to ready
+          if (previousStatus === 'processing' && updatedProject.dataStatus === 'ready') {
+            toast.success('Analysis Complete!', {
+              description: 'Your brand analysis is ready. Dashboard has been updated.',
+              duration: 5000,
+            });
           }
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error('❌ Error fetching project data:', error);
       }
     };
-    
-    // ONLY poll for updates if project is processing
-    // Don't fetch on initial load - only when actively processing
+
+    // Only fetch if project has no data or is processing
+    if (!selectedProject.data || selectedProject.dataStatus === 'processing') {
+      fetchProjectData();
+    }
+
+    // Set up polling for processing projects
     let pollInterval: NodeJS.Timeout | null = null;
     
     if (selectedProject.dataStatus === 'processing') {
-      console.log('🔄 Project is processing - starting automatic polling every 3 seconds...');
-      
-      // Initial fetch when processing starts
-      fetchProjectData();
-      
-      // Then poll every 3 seconds
+      console.log('🔄 Setting up polling for processing project...');
       pollInterval = setInterval(() => {
-        console.log('🔄 Polling for project updates...');
+        console.log('🔄 Polling for project data...');
         fetchProjectData();
-      }, 3000);
+      }, 10000); // Poll every 10 seconds
     }
     
     return () => {
@@ -446,19 +384,17 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     
     try {
       // Mark project as refreshing
-      // Validate project ID is a UUID before making API call
-      if (!storage.isValidUUID(selectedProject.id)) {
-        console.error('🚨 Invalid project UUID format:', selectedProject.id);
-        throw new Error('Invalid UUID format - legacy project needs to be removed');
-      }
+      const refreshingProject = {
+        ...selectedProject,
+        dataStatus: 'processing' as const,
+        lastRefreshAt: new Date().toISOString(),
+      };
       
-      storage.markProjectRefreshing(selectedProject.id);
-      
-      console.log("🔄 Starting dashboard refresh for:", selectedProject.name);
+      storage.saveProject(refreshingProject);
+      setSelectedProject(refreshingProject);
       
       const accessToken = storage.getAccessToken();
       if (!accessToken) {
-        logger.error('No access token during refresh - redirecting to sign in');
         toast.error('Session Expired', {
           description: 'Please sign in again to continue.'
         });
@@ -472,92 +408,83 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
         {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             projectId: selectedProject.id,
+            brandName: selectedProject.name,
+            market: selectedProject.market,
+            language: selectedProject.language,
           }),
         }
       );
-      
-      // Check if response is OK before trying to parse JSON
+
       if (!response.ok) {
-        let errorMessage = `Failed to refresh (${response.status})`;
-        try {
-          const data = await response.json();
-          errorMessage = data.error || data.message || errorMessage;
-        } catch (e) {
-          // Response is not JSON, use status text
-          errorMessage = response.statusText || errorMessage;
-        }
-        throw new Error(errorMessage);
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('❌ Refresh failed:', errorData);
+        toast.error('Refresh Failed', {
+          description: errorData.error || 'Could not refresh project data. Please try again.'
+        });
+        return;
       }
+
+      const data = await response.json();
       
-      // Parse successful response
-      let data;
-      try {
-        data = await response.json();
-      } catch (e) {
-        console.error('Failed to parse refresh response as JSON:', e);
-        throw new Error('Invalid response from server');
+      if (data.success) {
+        toast.success('Refresh Started', {
+          description: 'Your brand analysis is being updated. This usually takes 2-3 minutes.'
+        });
+        
+        // Start polling for updates
+        const pollInterval = setInterval(async () => {
+          try {
+            const statusResponse = await fetch(
+              `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/projects/${selectedProject.id}`,
+              {
+                headers: {
+                  'Authorization': `Bearer ${accessToken}`,
+                },
+              }
+            );
+            
+            if (statusResponse.ok) {
+              const statusData = await statusResponse.json();
+              
+              if (statusData.data_status === 'ready') {
+                clearInterval(pollInterval);
+                
+                // Update project with new data
+                const updatedProject = {
+                  ...selectedProject,
+                  data: statusData.data,
+                  dataStatus: 'ready',
+                  lastRefreshAt: statusData.last_refreshed_at || new Date().toISOString(),
+                };
+                
+                storage.saveProject(updatedProject);
+                setSelectedProject(updatedProject);
+                
+                toast.success('Analysis Complete!', {
+                  description: 'Your brand analysis has been updated successfully.'
+                });
+              }
+            }
+          } catch (error) {
+            console.error('❌ Error polling for updates:', error);
+          }
+        }, 10000); // Poll every 10 seconds
+        
+        // Stop polling after 5 minutes
+        setTimeout(() => {
+          clearInterval(pollInterval);
+        }, 300000);
       }
-      
-      console.log("✅ Refresh started, waiting for analysis...");
-      toast.success('Dashboard refresh started', {
-        description: 'Analyzing brand data with ChatGPT...'
+    } catch (error) {
+      console.error('❌ Error during refresh:', error);
+      toast.error('Refresh Failed', {
+        description: 'Could not refresh project data. Please try again.'
       });
-      
-      // Update status to processing
-      storage.updateProjectStatus(selectedProject.id, 'processing');
-      const updatedProject = storage.getProject(selectedProject.id);
-      if (updatedProject) {
-        setSelectedProject(updatedProject);
-      }
-      
-    } catch (error: any) {
-      console.error("❌ Refresh error:", error);
-      
-      // Check if this is a legacy project with invalid UUID
-      const errorString = JSON.stringify(error);
-      const isUUIDError = 
-        error.message?.includes('uuid') || 
-        error.message?.includes('UUID') ||
-        error.message?.includes('22P02') || // PostgreSQL invalid UUID error code
-        error.message?.includes('Project not found') ||
-        errorString.includes('uuid') ||
-        errorString.includes('UUID') ||
-        errorString.includes('22P02');
-      
-      if (isUUIDError) {
-        console.log('🧹 Removing legacy project with invalid UUID:', selectedProject.id);
-        toast.error('Invalid project removed', {
-          description: 'Legacy project with invalid ID was cleaned up.'
-        });
-        storage.deleteProject(selectedProject.id);
-        
-        // Reload projects
-        const updatedProjects = storage.getAllProjects();
-        setProjects(updatedProjects);
-        
-        // Select first valid project if available
-        if (updatedProjects.length > 0) {
-          setSelectedProject(updatedProjects[0]);
-          storage.setCurrentProject(updatedProjects[0]);
-        } else {
-          setSelectedProject(null);
-          storage.clearCurrentProject();
-        }
-      } else {
-        // Show user-friendly error message
-        const errorMessage = error.message || 'Unknown error occurred';
-        toast.error('Failed to refresh dashboard', {
-          description: errorMessage.includes('Network') 
-            ? 'Network connection failed. Please check your internet connection.' 
-            : errorMessage
-        });
-        storage.updateProjectStatus(selectedProject.id, 'error', errorMessage);
-      }
     } finally {
       setIsRefreshing(false);
     }
@@ -580,11 +507,10 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
         description: 'Clearing corrupted data and reloading from server...'
       });
       
-      // Clear all projects data but keep auth token
-      storage.clearAllAndRestoreAuth(accessToken);
+      // Clear all local storage
+      storage.clearAll();
       
-      // Reload projects from backend
-      console.log('📡 Fetching fresh projects from backend...');
+      // Fetch fresh data from backend
       const response = await fetch(
         `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/projects`,
         {
@@ -593,22 +519,18 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
           },
         }
       );
-      
+
       if (!response.ok) {
-        throw new Error('Failed to load projects from server');
+        throw new Error('Failed to fetch projects from backend');
       }
-      
+
       const data = await response.json();
       const backendProjects = data.projects || [];
       
-      console.log(`✅ Loaded ${backendProjects.length} projects from backend`);
-      
       if (backendProjects.length === 0) {
-        toast.warning('No Projects Found', {
-          description: 'Create a new project to get started.'
+        toast.info('No Projects Found', {
+          description: 'No projects found in your account. Please create a new project.'
         });
-        setProjects([]);
-        setSelectedProject(null);
         setShowDataCorruptionDialog(false);
         return;
       }
@@ -668,17 +590,15 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     const updatedProjects = storage.getAllProjects();
     setProjects(updatedProjects);
     
-    // Select first project or set to null
     if (updatedProjects.length > 0) {
-      setSelectedProject(updatedProjects[0]);
+      // Select first project
       storage.setCurrentProject(updatedProjects[0]);
+      setSelectedProject(updatedProjects[0]);
     } else {
-      // No projects left
+      // No projects left, clear selection
+      storage.clearCurrentProject();
       setSelectedProject(null);
     }
-    
-    // Navigate back to identity dashboard
-    setActiveItem("identity");
   };
 
   // Handle case when no project is selected
@@ -689,466 +609,99 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
           <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-6">
             <Binoculars className="w-8 h-8 text-primary" />
           </div>
-          <h2 className="text-foreground mb-3">No Projects Yet</h2>
-          <p className="text-muted-foreground mb-8">
-            Create your first project to start monitoring your brand's visibility in ChatGPT
+          <h3 className="text-foreground tracking-tight mb-2 text-[18px] font-medium">
+            No Project Selected
+          </h3>
+          <p className="text-muted-foreground tracking-tight text-[15px] mb-6">
+            Please select a project to view the dashboard.
           </p>
           <button
-            onClick={() => onNavigate?.(SCREENS.CREATE_PROJECT)}
-            className="px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-all duration-150 inline-flex items-center gap-2"
+            onClick={() => onNavigate?.(SCREENS.ONBOARDING_BRAND)}
+            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
           >
-            <span className="tracking-tight font-medium">Create Your First Project</span>
-            <ChevronRight className="w-4 h-4" />
+            Create Project
           </button>
         </div>
       </div>
     );
   }
 
-  // Get project data from selected project (guaranteed to exist after the check above)
-  const brandName = selectedProject.name;
-  const marketLabel = selectedProject.market;
-  const language = selectedProject.language;
-  const timeFrame = selectedProject.timeframe || 'Last 3 months';
-  const aiModel = selectedProject.aiModel || 'GPT-4o';
-
   return (
     <div className="h-screen bg-background flex">
       {/* Sidebar */}
-      <aside className="w-[240px] border-r border-sidebar-border bg-sidebar flex flex-col">
-        {/* Project Header */}
-        <div className="px-4 py-5 border-b border-sidebar-border">
-          <div className="flex items-center justify-between mb-5">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-                <Binoculars className="w-4 h-4 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sidebar-foreground tracking-tight truncate text-[14px] font-medium">
-                  Brand Sense
-                </h3>
-              </div>
-            </div>
-          </div>
-
-          <Separator className="mb-3 bg-sidebar-border" />
-
-          <div className="space-y-2">
-            <p className="text-sidebar-foreground/50 tracking-tight uppercase text-[10px] font-medium px-1">
-              Project Name
-            </p>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="w-full px-3 py-2.5 rounded-lg bg-sidebar-accent border border-sidebar-border hover:border-primary/30 transition-all duration-150 group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 text-left min-w-0">
-                      <p className="text-sidebar-foreground tracking-tight truncate text-[13px] font-medium">
-                        {brandName} · {marketLabel}
-                      </p>
-                    </div>
-                    <ChevronDown className="w-3.5 h-3.5 text-sidebar-foreground/50 group-hover:text-sidebar-foreground transition-colors shrink-0 ml-2" />
-                  </div>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="start" 
-                className="w-[208px] bg-popover border-border"
-              >
-                {projects.map((project) => (
-                  <DropdownMenuItem
-                    key={project.id}
-                    onClick={() => setSelectedProject(project)}
-                    className="cursor-pointer"
-                  >
-                    <div className="flex-1">
-                      <p className="text-[14px] font-medium tracking-tight">{project.name} · {project.market}</p>
-                    </div>
-                    {selectedProject?.id === project.id && (
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary ml-2" />
-                    )}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          
-          {/* Project Settings - Directly below dropdown */}
-          <nav className="space-y-0.5 mt-3">
-            {projectItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeItem === item.id;
-              const isHovered = hoveredItem === item.id;
-
-              return (
-                <motion.button
-                  key={item.id}
-                  onClick={() => setActiveItem(item.id)}
-                  onMouseEnter={() => setHoveredItem(item.id)}
-                  onMouseLeave={() => setHoveredItem(null)}
-                  className={`
-                    w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px]
-                    transition-all duration-150 relative group
-                    ${isActive 
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                      : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/60"
-                    }
-                  `}
-                >
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeProjectTab"
-                      className="absolute inset-0 bg-sidebar-accent rounded-lg border border-sidebar-border/50"
-                      transition={{ type: "spring", duration: 0.4, bounce: 0.2 }}
-                    />
-                  )}
-                  <Icon className="w-4 h-4 relative z-10 shrink-0" />
-                  <span className="relative z-10 tracking-tight truncate font-medium">{item.label}</span>
-                  <ChevronRight 
-                    className={`
-                      w-3.5 h-3.5 ml-auto relative z-10 shrink-0
-                      transition-all duration-150
-                      ${isActive || isHovered ? "opacity-70 translate-x-0" : "opacity-0 -translate-x-1"}
-                    `}
-                  />
-                </motion.button>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* Main Navigation */}
-        <div className="flex-1 overflow-y-auto py-4 px-3">
-          {/* Dashboards */}
-          <div className="mb-6">
-            <p className="px-2 mb-2 text-sidebar-foreground/50 tracking-tight uppercase text-[10px] font-medium">
-              Dashboards
-            </p>
-            <nav className="space-y-0.5">
-              {dashboards.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeItem === item.id;
-                const isHovered = hoveredItem === item.id;
-
-                return (
-                  <motion.button
-                    key={item.id}
-                    onClick={() => setActiveItem(item.id)}
-                    onMouseEnter={() => setHoveredItem(item.id)}
-                    onMouseLeave={() => setHoveredItem(null)}
-                    className={`
-                      w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg
-                      transition-all duration-150 relative group text-[13px]
-                      ${isActive 
-                        ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                        : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/60"
-                      }
-                    `}
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeTab"
-                        className="absolute inset-0 bg-sidebar-accent rounded-lg border border-sidebar-border/50"
-                        transition={{ type: "spring", duration: 0.4, bounce: 0.2 }}
-                      />
-                    )}
-                    <Icon className="w-4 h-4 relative z-10 shrink-0" />
-                    <span className="relative z-10 tracking-tight truncate font-medium">
-                      {item.label}
-                    </span>
-                    <ChevronRight 
-                      className={`
-                        w-3.5 h-3.5 ml-auto relative z-10 shrink-0
-                        transition-all duration-150
-                        ${isActive || isHovered ? "opacity-70 translate-x-0" : "opacity-0 -translate-x-1"}
-                      `}
-                    />
-                  </motion.button>
-                );
-              })}
-            </nav>
-          </div>
-
-        </div>
-
-        {/* User Profile & Account Section - Bottom */}
-        <div className="mt-auto border-t border-sidebar-border p-3">
-          {/* User Info */}
-          <div className="flex items-center gap-2.5 px-2 py-2 mb-1">
-            <div className="w-7 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-              <span className="text-primary tracking-tight text-[12px] font-medium">
-                {(() => {
-                  if (userEmail) {
-                    const localPart = userEmail.split('@')[0];
-                    const parts = localPart.split('.');
-                    if (parts.length >= 2) {
-                      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-                    }
-                    return localPart.substring(0, 2).toUpperCase();
-                  }
-                  return 'US';
-                })()}
-              </span>
-            </div>
-            <div className="flex-1 text-left min-w-0">
-              <p className="text-sidebar-foreground tracking-tight truncate text-[13px] font-medium">
-                {userEmail || 'Sign in to continue'}
-              </p>
-            </div>
-          </div>
-          
-          {/* Account Menu Items */}
-          <nav className="space-y-0.5">
-            {accountItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeItem === item.id;
-              const isHovered = hoveredItem === item.id;
-
-              return (
-                <motion.button
-                  key={item.id}
-                  onClick={() => setActiveItem(item.id)}
-                  onMouseEnter={() => setHoveredItem(item.id)}
-                  onMouseLeave={() => setHoveredItem(null)}
-                  className={`
-                    w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px]
-                    transition-all duration-150 relative group
-                    ${isActive 
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground" 
-                      : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/60"
-                    }
-                  `}
-                >
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeAccountTab"
-                      className="absolute inset-0 bg-sidebar-accent rounded-lg border border-sidebar-border/50"
-                      transition={{ type: "spring", duration: 0.4, bounce: 0.2 }}
-                    />
-                  )}
-                  <Icon className="w-4 h-4 relative z-10 shrink-0" />
-                  <span className="relative z-10 tracking-tight truncate font-medium">{item.label}</span>
-                  <ChevronRight 
-                    className={`
-                      w-3.5 h-3.5 ml-auto relative z-10 shrink-0
-                      transition-all duration-150
-                      ${isActive || isHovered ? "opacity-70 translate-x-0" : "opacity-0 -translate-x-1"}
-                    `}
-                  />
-                </motion.button>
-              );
-            })}
-            
-            {/* Logout Button */}
-            <button
-              onClick={() => setShowLogoutDialog(true)}
-              onMouseEnter={() => setHoveredItem('logout')}
-              onMouseLeave={() => setHoveredItem(null)}
-              className="
-                w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px]
-                text-sidebar-foreground/70 hover:text-destructive
-                hover:bg-destructive/10 transition-all duration-150 group
-              "
-            >
-              <LogOut className="w-4 h-4 shrink-0" />
-              <span className="tracking-tight truncate font-medium">Log Out</span>
-              <ChevronRight 
-                className={`
-                  w-3.5 h-3.5 ml-auto shrink-0
-                  transition-all duration-150
-                  ${hoveredItem === 'logout' ? "opacity-70 translate-x-0" : "opacity-0 -translate-x-1"}
-                `}
-              />
-            </button>
-          </nav>
-        </div>
-      </aside>
+      <Sidebar
+        activeItem={activeItem}
+        setActiveItem={setActiveItem}
+        hoveredItem={hoveredItem}
+        setHoveredItem={setHoveredItem}
+        userEmail={userEmail}
+        onLogout={() => setShowLogoutDialog(true)}
+        projects={projects}
+        selectedProject={selectedProject}
+        onProjectSelect={(project) => {
+          storage.setCurrentProject(project);
+          setSelectedProject(project);
+        }}
+      />
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto relative">
-        
-        {/* Top Navigation Bar - Only show for dashboards, not for account pages */}
-        {activeItem !== 'profile' && activeItem !== 'account-settings' && activeItem !== 'project-settings' && (
-          <header className="h-[72px] border-b border-border bg-background sticky top-0 z-10">
-            <div className="h-full px-8 flex items-center justify-between">
-              <div>
-                <h1 className="text-foreground tracking-tight text-[20px] font-medium">
-                  {dashboards.find(d => d.id === activeItem)?.label}
-                </h1>
-              </div>
-              <div className="flex items-center gap-4">
-                {selectedProject?.lastRefreshAt && (
-                  <div className="text-muted-foreground tracking-tight text-[13px]">
-                    Last updated: {new Date(selectedProject.lastRefreshAt).toLocaleDateString('en-US', { 
-                      month: 'short', 
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </div>
-                )}
-                <button 
-                  onClick={() => setShowFeedbackDialog(true)}
-                  className="px-4 py-2 rounded-lg bg-card border border-border text-foreground hover:bg-secondary/80 transition-all duration-150 tracking-tight flex items-center gap-2 text-[14px] font-medium"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  Share Feedback
-                </button>
-                <div className="relative">
-                  <button 
-                    onClick={handleRefresh}
-                    disabled={isRefreshing || !selectedProject}
-                    className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-150 tracking-tight disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-[14px] font-medium"
-                  >
-                    <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                    {isRefreshing ? 'Refreshing...' : 'Refresh Dashboard'}
-                  </button>
-                  {/* Pulse indicator when data is pending/processing */}
-                  {(selectedProject?.dataStatus === 'pending' || selectedProject?.dataStatus === 'processing') && !isRefreshing && (
-                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-vercel-green opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-vercel-green"></span>
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </header>
-        )}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <Header
+          selectedProject={selectedProject}
+          isRefreshing={isRefreshing}
+          onRefresh={handleRefresh}
+          onShowFeedback={() => setShowFeedbackDialog(true)}
+          onShowDataRecovery={() => setShowDataCorruptionDialog(true)}
+          showOnboardingBanner={showOnboardingBanner}
+          onDismissOnboarding={dismissOnboardingBanner}
+        />
 
-        {/* Onboarding Banner - Show when data is pending/processing and banner not dismissed */}
-        {showOnboardingBanner && 
-         (selectedProject?.dataStatus === 'pending' || selectedProject?.dataStatus === 'processing') &&
-         activeItem !== 'profile' && 
-         activeItem !== 'account-settings' && 
-         activeItem !== 'project-settings' && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="mx-8 mt-8 mb-0"
-          >
-            <div className="relative overflow-hidden rounded-lg border border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10 backdrop-blur-sm">
-              <div className="px-6 py-4 flex items-center gap-4">
-                {/* Icon */}
-                <div className="shrink-0">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                  </div>
-                </div>
+        {/* Main Content */}
+        <MainContent
+          activeItem={activeItem}
+          selectedProject={selectedProject}
+          onNavigate={onNavigate}
+          onDeleteProject={handleProjectDeleted}
+        />
+      </div>
 
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="text-foreground tracking-tight text-[15px] font-medium">
-                      {selectedProject?.dataStatus === 'processing' 
-                        ? 'Your Analysis is Being Processed'
-                        : 'Welcome to Brand Sense!'}
-                    </h3>
-                    {selectedProject?.dataStatus === 'processing' && (
-                      <div className="flex items-center gap-1">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" style={{ animationDelay: '0ms' }} />
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" style={{ animationDelay: '150ms' }} />
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" style={{ animationDelay: '300ms' }} />
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-muted-foreground tracking-tight text-[13px]">
-                    {selectedProject?.dataStatus === 'processing' 
-                      ? 'ChatGPT is analyzing your brand data. This usually takes 2-3 minutes. Click Refresh to check if your data is ready.'
-                      : 'Your brand analysis will be ready in a few minutes. Click the Refresh Dashboard button to load your data when ready.'}
-                  </p>
-                </div>
+      {/* Feedback Dialog */}
+      <FeedbackDialog
+        open={showFeedbackDialog}
+        onOpenChange={setShowFeedbackDialog}
+      />
 
-                {/* CTA */}
-                <button
-                  onClick={handleRefresh}
-                  disabled={isRefreshing}
-                  className="shrink-0 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-150 tracking-tight disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-[14px] font-medium group"
-                >
-                  <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-300'}`} />
-                  {isRefreshing ? 'Checking...' : 'Refresh Now'}
-                  {!isRefreshing && <ArrowRight className="w-4 h-4" />}
-                </button>
-
-                {/* Dismiss Button */}
-                <button
-                  onClick={dismissOnboardingBanner}
-                  className="shrink-0 p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-all duration-150"
-                  aria-label="Dismiss banner"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Animated gradient border effect */}
-              <div className="absolute inset-0 rounded-lg border border-primary/20 pointer-events-none" />
-            </div>
-          </motion.div>
-        )}
-
-        {/* Dashboard Content */}
-        <div className={activeItem === 'profile' || activeItem === 'account-settings' || activeItem === 'project-settings' ? '' : 'p-8'}>
-          <div className={activeItem === 'profile' || activeItem === 'account-settings' || activeItem === 'project-settings' ? '' : 'max-w-[1400px] mx-auto space-y-8'}>
-            {/* Project Data Details - Only show for dashboards */}
-            {activeItem !== 'profile' && activeItem !== 'account-settings' && activeItem !== 'project-settings' && (
-              <div className="grid grid-cols-5 gap-3">
-                <div className="px-3 py-2 rounded-lg border border-border/50 bg-card/50">
-                  <p className="text-muted-foreground/60 mb-0.5 tracking-tight text-[11px]">Brand Name</p>
-                  <p className="text-foreground tracking-tight text-[13px] font-medium">{brandName}</p>
-                </div>
-                <div className="px-3 py-2 rounded-lg border border-border/50 bg-card/50">
-                  <p className="text-muted-foreground/60 mb-0.5 tracking-tight text-[11px]">Analyzed Market</p>
-                  <p className="text-foreground tracking-tight text-[13px] font-medium">{marketLabel}</p>
-                </div>
-                <div className="px-3 py-2 rounded-lg border border-border/50 bg-card/50">
-                  <p className="text-muted-foreground/60 mb-0.5 tracking-tight text-[11px]">Audience Language</p>
-                  <p className="text-foreground tracking-tight text-[13px] font-medium">{language}</p>
-                </div>
-                <div className="px-3 py-2 rounded-lg border border-border/50 bg-card/50">
-                  <p className="text-muted-foreground/60 mb-0.5 tracking-tight text-[11px]">Report Timeframe</p>
-                  <p className="text-foreground tracking-tight text-[13px] font-medium">{timeFrame}</p>
-                </div>
-                <div className="px-3 py-2 rounded-lg border border-border/50 bg-card/50">
-                  <p className="text-muted-foreground/60 mb-0.5 tracking-tight text-[11px]">AI Model</p>
-                  <p className="text-foreground tracking-tight text-[13px] font-medium">{aiModel}</p>
-                </div>
-              </div>
-            )}
-
-
-
-            {/* Dashboard Specific Content */}
-            {activeItem === "keyword" && (
-              <KeywordAnalysis 
-                project={selectedProject}
-              />
-            )}
-            {activeItem === "identity" && (
-              <BrandIdentity 
-                project={selectedProject}
-              />
-            )}
-            {activeItem === "sentiment" && (
-              <SentimentAnalysis 
-                project={selectedProject}
-              />
-            )}
-            {activeItem === "profile" && (
-              <Profile onNavigate={onNavigate} />
-            )}
-            {activeItem === "account-settings" && (
-              <AccountSettings onNavigate={onNavigate} />
-            )}
-            {activeItem === "project-settings" && (
-              <ProjectSettings 
-                onNavigate={onNavigate}
-                selectedProject={selectedProject}
-                onDeleteProject={handleProjectDeleted}
-              />
-            )}
-          </div>
-        </div>
-      </main>
+      {/* Data Corruption Recovery Dialog */}
+      <AlertDialog open={showDataCorruptionDialog} onOpenChange={setShowDataCorruptionDialog}>
+        <AlertDialogContent className="bg-card border-border">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-foreground">Data Recovery Required</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              We detected corrupted data in your local storage. This can happen when:
+              <ul className="list-disc list-inside mt-2 space-y-1 text-muted-foreground">
+                <li>LocalStorage has corrupt cached data</li>
+                <li>Backend returned mismatched project data</li>
+                <li>Session data is out of sync</li>
+              </ul>
+              <p className="mt-4 text-foreground/90">
+                Would you like to <strong className="text-primary">clear all cached data</strong> and reload fresh data from the server?
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-card border-border hover:bg-secondary/80">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDataRecovery}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Recover Data
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Logout Confirmation Dialog */}
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
@@ -1173,45 +726,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Feedback Dialog */}
-      <FeedbackDialog 
-        open={showFeedbackDialog}
-        onOpenChange={setShowFeedbackDialog}
-      />
-
-      {/* Data Corruption Recovery Dialog */}
-      <AlertDialog open={showDataCorruptionDialog} onOpenChange={setShowDataCorruptionDialog}>
-        <AlertDialogContent className="bg-card border-destructive">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-destructive">Data Corruption Detected</AlertDialogTitle>
-            <AlertDialogDescription className="text-foreground/80">
-              Multiple projects are showing incorrect data. This usually happens when:
-              <ul className="list-disc list-inside mt-2 space-y-1 text-muted-foreground">
-                <li>LocalStorage has corrupt cached data</li>
-                <li>Backend returned mismatched project data</li>
-                <li>Session data is out of sync</li>
-              </ul>
-              <p className="mt-4 text-foreground/90">
-                Would you like to <strong className="text-primary">clear all cached data</strong> and reload fresh data from the server?
-              </p>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="bg-secondary text-secondary-foreground hover:bg-secondary/80">
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDataRecovery}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              Clear & Reload Data
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Toast Notifications */}
-      <Toaster position="bottom-right" />
+      <Toaster />
     </div>
   );
 }
