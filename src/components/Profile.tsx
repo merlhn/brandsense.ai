@@ -60,23 +60,57 @@ export function Profile({ onNavigate }: ProfileProps) {
   const handleSaveInfo = async () => {
     setIsSavingInfo(true);
     
-    // Save to localStorage
-    storage.setUserFullName(fullName.trim());
-    localStorage.setItem('user_position', position.trim());
-    localStorage.setItem('user_company', company.trim());
-    
-    // Update original values
-    setOriginalFullName(fullName.trim());
-    setOriginalPosition(position.trim());
-    setOriginalCompany(company.trim());
-    
-    // Simulate API call (can be replaced with Supabase call later)
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    setIsSavingInfo(false);
-    setIsEditingInfo(false);
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3000);
+    try {
+      const accessToken = storage.getAccessToken();
+      if (!accessToken) {
+        alert("Session expired. Please sign in again.");
+        return;
+      }
+
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/user/profile`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            fullName: fullName.trim(),
+            position: position.trim(),
+            company: company.trim(),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || 'Failed to update profile');
+        setIsSavingInfo(false);
+        return;
+      }
+
+      // Success - update localStorage
+      storage.setUserFullName(fullName.trim());
+      localStorage.setItem('user_position', position.trim());
+      localStorage.setItem('user_company', company.trim());
+      
+      // Update original values
+      setOriginalFullName(fullName.trim());
+      setOriginalPosition(position.trim());
+      setOriginalCompany(company.trim());
+      
+      setIsSavingInfo(false);
+      setIsEditingInfo(false);
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 3000);
+      
+    } catch (error) {
+      console.error('Profile update error:', error);
+      alert('Failed to update profile. Please try again.');
+      setIsSavingInfo(false);
+    }
   };
 
   const handleSavePassword = async () => {
