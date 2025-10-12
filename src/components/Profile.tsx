@@ -62,8 +62,12 @@ export function Profile({ onNavigate }: ProfileProps) {
     
     try {
       const accessToken = storage.getAccessToken();
+      console.log('🔍 Profile Update - Access Token:', accessToken ? 'Present' : 'Missing');
+      
       if (!accessToken) {
+        console.log('❌ No access token found');
         toast.error("Session expired. Please sign in again.");
+        setIsSavingInfo(false);
         return;
       }
 
@@ -84,8 +88,10 @@ export function Profile({ onNavigate }: ProfileProps) {
       );
 
       const data = await response.json();
+      console.log('📡 Profile Update Response:', { status: response.status, data });
 
       if (!response.ok) {
+        console.log('❌ Profile update failed:', data);
         toast.error(data.error || 'Failed to update profile');
         setIsSavingInfo(false);
         return;

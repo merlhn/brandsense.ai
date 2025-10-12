@@ -34,7 +34,11 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showDataCorruptionDialog, setShowDataCorruptionDialog] = useState(false);
-  const [userEmail, setUserEmail] = useState(storage.getUserEmail() || '');
+  const [userEmail, setUserEmail] = useState(() => {
+    const email = storage.getUserEmail();
+    console.log('🔍 DashboardLayout - Initial userEmail:', email);
+    return email || '';
+  });
   const [showOnboardingBanner, setShowOnboardingBanner] = useState(() => {
     // Only show banner if user hasn't dismissed it before
     const dismissed = localStorage.getItem('onboarding_banner_dismissed');
@@ -79,8 +83,12 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
   useEffect(() => {
     const handleStorageChange = () => {
       const email = storage.getUserEmail();
+      console.log('🔄 Storage change detected - userEmail:', email);
       if (email) {
         setUserEmail(email);
+        console.log('✅ UserEmail updated to:', email);
+      } else {
+        console.log('⚠️ No email found in storage');
       }
     };
 
