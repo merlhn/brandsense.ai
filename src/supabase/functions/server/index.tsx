@@ -576,11 +576,11 @@ app.post("/make-server-cf9a9609/auth/change-password", async (c) => {
 });
 
 /**
- * PUT /make-server-cf9a9609/user/profile
+ * POST /make-server-cf9a9609/user/profile
  * Headers: Authorization: Bearer <access_token>
  * Body: { fullName, position, company }
  */
-app.put("/make-server-cf9a9609/user/profile", async (c) => {
+app.post("/make-server-cf9a9609/user/profile", async (c) => {
   try {
     const authHeader = c.req.header('Authorization');
     const { error: authError, user } = await verifyAuth(authHeader);
