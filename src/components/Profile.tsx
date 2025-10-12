@@ -67,8 +67,30 @@ export function Profile({ onNavigate }: ProfileProps) {
       console.log('🔍 Profile Update - Access Token:', accessToken ? 'Present' : 'Missing');
       console.log('🔍 Profile Update - Data to save:', { fullName, position, company });
       
-      // Skip health check for now - direct to profile update
-      console.log('⏭️ Skipping health check - going directly to profile update');
+      // Check backend health first
+      try {
+        console.log('🔍 Checking backend health...');
+        const healthResponse = await fetch(
+          `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/health`,
+          {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
+          }
+        );
+        if (!healthResponse.ok) {
+          console.log('❌ Backend health check failed:', healthResponse.status);
+          toast.error("Backend is currently unavailable. Please try again later.");
+          setIsSavingInfo(false);
+          return;
+        }
+        console.log('✅ Backend health check passed');
+      } catch (healthError) {
+        console.log('❌ Backend health check error:', healthError);
+        toast.error("Cannot connect to server. Please check your internet connection.");
+        setIsSavingInfo(false);
+        return;
+      }
       
       if (!accessToken) {
         console.log('❌ No access token found');
