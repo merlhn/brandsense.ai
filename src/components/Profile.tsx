@@ -104,11 +104,13 @@ export function Profile({ onNavigate }: ProfileProps) {
       }
 
       console.log('📡 Making profile update API call...');
+      const endpointUrl = `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/user/profile`;
+      console.log('🔍 Endpoint URL:', endpointUrl);
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
       
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/user/profile`,
+        endpointUrl,
         {
           method: 'POST',
           headers: {
