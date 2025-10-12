@@ -102,13 +102,12 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     return null;
   });
 
-  // Authentication guard - redirect to sign in if no access token or email
+  // Authentication guard - redirect to sign in if no access token
   useEffect(() => {
     const accessToken = storage.getAccessToken();
-    const email = storage.getUserEmail();
     
-    if (!accessToken || !email) {
-      logger.security('No access token or email found in DashboardLayout, redirecting to sign in');
+    if (!accessToken) {
+      logger.security('No access token found in DashboardLayout, redirecting to sign in');
       toast.error('Session Expired', {
         description: 'Please sign in again to continue.'
       });
@@ -892,7 +891,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
             </div>
             <div className="flex-1 text-left min-w-0">
               <p className="text-sidebar-foreground tracking-tight truncate text-[13px] font-medium">
-                {userEmail || 'Loading...'}
+                {userEmail || 'Sign in to continue'}
               </p>
             </div>
           </div>
