@@ -64,10 +64,33 @@ export function Profile({ onNavigate }: ProfileProps) {
       const accessToken = storage.getAccessToken();
       console.log('🔍 Profile Update - Access Token:', accessToken ? 'Present' : 'Missing');
       
+      // Check backend health first
+      try {
+        const healthResponse = await fetch(
+          `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/health`
+        );
+        if (!healthResponse.ok) {
+          console.log('❌ Backend health check failed');
+          toast.error("Backend is currently unavailable. Please try again later.");
+          setIsSavingInfo(false);
+          return;
+        }
+        console.log('✅ Backend health check passed');
+      } catch (healthError) {
+        console.log('❌ Backend health check error:', healthError);
+        toast.error("Cannot connect to server. Please check your internet connection.");
+        setIsSavingInfo(false);
+        return;
+      }
+      
       if (!accessToken) {
         console.log('❌ No access token found');
         toast.error("Session expired. Please sign in again.");
         setIsSavingInfo(false);
+        // Auto redirect to sign in
+        setTimeout(() => {
+          window.location.href = '/signin';
+        }, 2000);
         return;
       }
 
@@ -92,6 +115,20 @@ export function Profile({ onNavigate }: ProfileProps) {
 
       if (!response.ok) {
         console.log('❌ Profile update failed:', data);
+        
+        // Handle 401 Unauthorized - Session expired
+        if (response.status === 401) {
+          toast.error("Session expired. Redirecting to sign in...");
+          // Clear storage and redirect
+          storage.clearAll();
+          setTimeout(() => {
+            window.location.href = '/signin';
+          }, 2000);
+          setIsSavingInfo(false);
+          return;
+        }
+        
+        // Handle other errors
         toast.error(data.error || 'Failed to update profile');
         setIsSavingInfo(false);
         return;
@@ -116,7 +153,16 @@ export function Profile({ onNavigate }: ProfileProps) {
       
     } catch (error) {
       console.error('Profile update error:', error);
-      toast.error('Failed to update profile. Please try again.');
+      
+      // Handle specific network errors
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        toast.error('Network error. Please check your internet connection and try again.');
+      } else if (error.name === 'AbortError') {
+        toast.error('Request was cancelled. Please try again.');
+      } else {
+        toast.error('Failed to update profile. Please try again.');
+      }
+      
       setIsSavingInfo(false);
     }
   };
