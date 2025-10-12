@@ -6,6 +6,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
 import { storage } from "../lib/storage";
+import { projectId } from "../utils/supabase/info";
 
 interface ProfileProps {
   onNavigate?: (screen: string) => void;
@@ -89,15 +90,51 @@ export function Profile({ onNavigate }: ProfileProps) {
     }
     
     setIsSavingPassword(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 800));
-    setIsSavingPassword(false);
-    setIsEditingPassword(false);
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3000);
+    
+    try {
+      const accessToken = storage.getAccessToken();
+      if (!accessToken) {
+        alert("Session expired. Please sign in again.");
+        return;
+      }
+
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/auth/change-password`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            currentPassword,
+            newPassword,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || 'Failed to change password');
+        setIsSavingPassword(false);
+        return;
+      }
+
+      // Success
+      setIsSavingPassword(false);
+      setIsEditingPassword(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 3000);
+      
+    } catch (error) {
+      console.error('Password change error:', error);
+      alert('Failed to change password. Please try again.');
+      setIsSavingPassword(false);
+    }
   };
 
   const handleCancelInfo = () => {
@@ -341,16 +378,6 @@ export function Profile({ onNavigate }: ProfileProps) {
             )}
           </section>
 
-          {/* Preferences */}
-          <section className="bg-card border border-border rounded-lg p-6">
-            <div className="mb-6">
-              <h2 className="text-foreground tracking-tight mb-1">Preferences</h2>
-              <p className="text-muted-foreground tracking-tight">
-                Customize your notification settings
-              </p>
-            </div>
-
-          </section>
         </div>
       </div>
     </div>

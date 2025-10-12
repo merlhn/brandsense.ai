@@ -432,6 +432,86 @@ app.get("/make-server-cf9a9609/auth/session", async (c) => {
   }
 });
 
+/**
+ * POST /make-server-cf9a9609/auth/change-password
+ * Headers: Authorization: Bearer <access_token>
+ * Body: { currentPassword, newPassword }
+ */
+app.post("/make-server-cf9a9609/auth/change-password", async (c) => {
+  try {
+    const authHeader = c.req.header('Authorization');
+    const { error: authError, user } = await verifyAuth(authHeader);
+
+    if (authError || !user) {
+      return c.json({ error: authError || 'Unauthorized' }, 401);
+    }
+
+    const body = await c.req.json();
+    const { currentPassword, newPassword } = body;
+
+    // Validate required fields
+    if (!currentPassword || !newPassword) {
+      return c.json({ 
+        error: 'Missing required fields: currentPassword, newPassword' 
+      }, 400);
+    }
+
+    // Validate new password strength
+    if (newPassword.length < 8) {
+      return c.json({ 
+        error: 'New password must be at least 8 characters long' 
+      }, 400);
+    }
+
+    if (currentPassword === newPassword) {
+      return c.json({ 
+        error: 'New password must be different from current password' 
+      }, 400);
+    }
+
+    const accessToken = authHeader!.split(' ')[1];
+    const supabase = getSupabaseClient(accessToken);
+
+    // Verify current password by attempting to sign in
+    const { error: verifyError } = await supabase.auth.signInWithPassword({
+      email: user.email!,
+      password: currentPassword,
+    });
+
+    if (verifyError) {
+      console.error('Current password verification failed:', verifyError);
+      return c.json({ 
+        error: 'Current password is incorrect' 
+      }, 401);
+    }
+
+    // Update password using Supabase Auth
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: newPassword
+    });
+
+    if (updateError) {
+      console.error('Password update error:', updateError);
+      return c.json({ 
+        error: updateError.message || 'Failed to update password' 
+      }, 500);
+    }
+
+    console.log('✅ Password updated successfully for user:', user.email);
+
+    return c.json({ 
+      success: true,
+      message: 'Password updated successfully'
+    });
+
+  } catch (error) {
+    console.error('Change password endpoint error:', error);
+    return c.json({ 
+      error: 'Internal server error during password change' 
+    }, 500);
+  }
+});
+
 // ============================================
 // CHATGPT API UTILITIES
 // ============================================

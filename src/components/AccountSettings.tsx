@@ -71,47 +71,7 @@ export function AccountSettings({ onNavigate }: AccountSettingsProps) {
 
       <div className="max-w-5xl mx-auto px-8 py-8">
         <div className="space-y-8">
-          {/* Notification Settings */}
-          <section className="bg-card border border-border rounded-lg p-6">
-            <div className="mb-6">
-              <h2 className="text-foreground tracking-tight mb-1">Notifications</h2>
-              <p className="text-muted-foreground tracking-tight">
-                Choose what updates you want to receive
-              </p>
-            </div>
 
-          </section>
-
-          {/* Security */}
-          <section className="bg-card border border-border rounded-lg p-6">
-            <div className="mb-6">
-              <h2 className="text-foreground tracking-tight mb-1">Security</h2>
-              <p className="text-muted-foreground tracking-tight">
-                Manage your password and security settings
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-start justify-between border border-border rounded-lg p-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Key className="w-4 h-4 text-muted-foreground" />
-                    <h3 className="text-foreground tracking-tight">Password</h3>
-                  </div>
-                  <p className="text-muted-foreground tracking-tight">
-                    Last changed 3 months ago
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  className="ml-4 h-9 px-4 bg-card border-border hover:bg-secondary/80"
-                >
-                  Change Password
-                </Button>
-              </div>
-
-            </div>
-          </section>
 
           {/* Danger Zone */}
           <section className="bg-card border border-destructive/50 rounded-lg p-6">
