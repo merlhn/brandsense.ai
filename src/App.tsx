@@ -23,15 +23,51 @@ export default function App() {
   const [activeScreen, setActiveScreen] = useState<Screen>(SCREENS.LANDING);
   const [isValidating, setIsValidating] = useState(true);
 
-  // Validate session on app startup
+  // Handle URL-based routing
   useEffect(() => {
-    const validate = async () => {
-      const result = await validateUserSession();
-      setActiveScreen(result.screen);
-      setIsValidating(false);
+    const handleRoute = () => {
+      const path = window.location.pathname;
+      
+      // URL-based routing
+      if (path === '/landing' || path === '/') {
+        setActiveScreen(SCREENS.LANDING);
+        setIsValidating(false);
+        return;
+      }
+      
+      if (path === '/signin') {
+        setActiveScreen(SCREENS.SIGN_IN);
+        setIsValidating(false);
+        return;
+      }
+      
+      if (path === '/signup') {
+        setActiveScreen(SCREENS.SIGN_UP);
+        setIsValidating(false);
+        return;
+      }
+      
+      if (path === '/dashboard') {
+        setActiveScreen(SCREENS.DASHBOARD);
+        setIsValidating(false);
+        return;
+      }
+      
+      // Default: validate session for other routes
+      const validate = async () => {
+        const result = await validateUserSession();
+        setActiveScreen(result.screen);
+        setIsValidating(false);
+      };
+      
+      validate();
     };
     
-    validate();
+    handleRoute();
+    
+    // Listen for browser back/forward
+    window.addEventListener('popstate', handleRoute);
+    return () => window.removeEventListener('popstate', handleRoute);
   }, []);
 
   // Show loading while validating
@@ -41,6 +77,17 @@ export default function App() {
 
   const handleNavigate = (screen: string) => {
     setActiveScreen(screen as Screen);
+    
+    // Update URL based on screen
+    const pathMap: Record<string, string> = {
+      [SCREENS.LANDING]: '/landing',
+      [SCREENS.SIGN_IN]: '/signin',
+      [SCREENS.SIGN_UP]: '/signup',
+      [SCREENS.DASHBOARD]: '/dashboard',
+    };
+    
+    const path = pathMap[screen] || '/landing';
+    window.history.pushState({}, '', path);
   };
 
   // Common props interface for screen components
