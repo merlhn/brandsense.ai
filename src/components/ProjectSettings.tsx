@@ -59,6 +59,27 @@ export function ProjectSettings({ onNavigate, onDeleteProject, selectedProject }
 
   // No form data initialization needed for read-only view
 
+  // Early return if no project selected
+  if (!selectedProject) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">📁</div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">No Project Selected</h1>
+          <p className="text-muted-foreground mb-4">
+            Please select a project to view its settings.
+          </p>
+          <Button 
+            onClick={() => onNavigate?.('dashboard')}
+            className="bg-primary hover:bg-primary/90"
+          >
+            Go to Dashboard
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   // Convert market and language from display format to select values for display
   const marketValueMap: Record<string, string> = {
     "Türkiye": "turkey",
