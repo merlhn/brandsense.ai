@@ -83,16 +83,22 @@ app.use(
   "/*",
   cors({
     origin: "*",
-    allowHeaders: ["Content-Type", "Authorization"],
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    exposeHeaders: ["Content-Length"],
-    maxAge: 600,
+    allowHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    exposeHeaders: ["Content-Length", "X-Total-Count"],
+    maxAge: 86400, // 24 hours
+    credentials: false,
   }),
 );
 
-// Handle preflight requests
+// Handle preflight requests explicitly
 app.options("/*", (c) => {
-  return c.text("", 200);
+  return c.text("", 200, {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+    "Access-Control-Max-Age": "86400",
+  });
 });
 
 // ============================================
