@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { motion } from "motion/react";
+import { useState } from "react";
 import { Lock, Check, X } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -105,17 +104,6 @@ export function Profile({ onNavigate }: ProfileProps) {
                 Manage your account information and preferences
               </p>
             </div>
-            {showSuccessMessage && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: -10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-success/10 border border-success/20"
-              >
-                <Check className="w-4 h-4 text-success" />
-                <span className="text-success tracking-tight">Changes saved successfully</span>
-              </motion.div>
-            )}
           </div>
         </div>
       </div>
