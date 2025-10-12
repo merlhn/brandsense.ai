@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { Globe, MessageSquare, FileText, Calendar, RefreshCw, Cpu, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
+import { Input } from "./ui/input";
 import {
   AlertDialog,
   AlertDialogAction,
