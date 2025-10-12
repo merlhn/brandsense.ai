@@ -51,6 +51,11 @@ const languages = [
 ];
 
 export function ProjectSettings({ onNavigate, onDeleteProject, selectedProject }: ProjectSettingsProps) {
+  console.log('🔍 ProjectSettings - Component mounted');
+  console.log('🔍 ProjectSettings - selectedProject:', selectedProject ? 'Present' : 'Missing');
+  console.log('🔍 ProjectSettings - selectedProject ID:', selectedProject?.id);
+  console.log('🔍 ProjectSettings - selectedProject name:', selectedProject?.name);
+  
   // Delete confirmation state
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);

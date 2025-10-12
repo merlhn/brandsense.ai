@@ -35,44 +35,54 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
   useEffect(() => {
     const handleDashboardRoute = () => {
       const path = window.location.pathname;
+      console.log('🔍 DashboardLayout - URL path:', path);
+      console.log('🔍 DashboardLayout - Current activeItem:', activeItem);
       
       // Dashboard sub-routes
       if (path === '/dashboard' || path === '/dashboard/') {
+        console.log('✅ Setting activeItem to identity');
         setActiveItem('identity');
         return;
       }
       
       if (path === '/dashboard/identity') {
+        console.log('✅ Setting activeItem to identity');
         setActiveItem('identity');
         return;
       }
       
       if (path === '/dashboard/sentiment') {
+        console.log('✅ Setting activeItem to sentiment');
         setActiveItem('sentiment');
         return;
       }
       
       if (path === '/dashboard/keyword') {
+        console.log('✅ Setting activeItem to keyword');
         setActiveItem('keyword');
         return;
       }
       
       if (path === '/dashboard/profile') {
+        console.log('✅ Setting activeItem to profile');
         setActiveItem('profile');
         return;
       }
       
       if (path === '/dashboard/account-settings') {
+        console.log('✅ Setting activeItem to account-settings');
         setActiveItem('account-settings');
         return;
       }
       
       if (path === '/dashboard/project-settings') {
+        console.log('✅ Setting activeItem to project-settings');
         setActiveItem('project-settings');
         return;
       }
       
       // Default to identity if no match
+      console.log('⚠️ No route match, defaulting to identity');
       setActiveItem('identity');
     };
     
@@ -81,7 +91,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     // Listen for browser back/forward
     window.addEventListener('popstate', handleDashboardRoute);
     return () => window.removeEventListener('popstate', handleDashboardRoute);
-  }, []);
+  }, [activeItem]);
 
   // Update URL when activeItem changes
   const handleSetActiveItem = (item: string) => {
