@@ -7,6 +7,7 @@ import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
 import { storage } from "../lib/storage";
 import { projectId } from "../utils/supabase/info";
+import { toast } from "sonner@2.0.3";
 
 interface ProfileProps {
   onNavigate?: (screen: string) => void;
@@ -85,7 +86,7 @@ export function Profile({ onNavigate }: ProfileProps) {
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
       
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/user/profile`,
+        `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/user/profile`,
         {
           method: 'PUT',
           headers: {
