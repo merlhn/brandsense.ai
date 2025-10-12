@@ -658,9 +658,9 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     // Clear all storage data
     storage.clearAll();
     
-    // Navigate back to sign in
+    // Navigate back to landing page
     setShowLogoutDialog(false);
-    onNavigate?.(SCREENS.SIGN_IN);
+    onNavigate?.(SCREENS.LANDING);
   };
   
   const handleProjectDeleted = () => {
@@ -1156,7 +1156,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
           <AlertDialogHeader>
             <AlertDialogTitle className="text-foreground">Log out of Brand Sense?</AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground">
-              You will be signed out of your account and redirected to the sign in page.
+              You will be signed out of your account and redirected to the landing page.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
