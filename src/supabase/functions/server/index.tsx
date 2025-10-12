@@ -87,7 +87,7 @@ app.use('*', logger(console.log));
  * Headers: Authorization: Bearer <access_token>
  * Body: { fullName, position, company }
  */
-app.post("/user/profile", async (c) => {
+app.post("/make-server-cf9a9609/user/profile", async (c) => {
   console.log('🔍 Profile endpoint hit!', c.req.method, c.req.url);
   console.log('🔍 Headers:', c.req.header('Authorization') ? 'Present' : 'Missing');
   try {
