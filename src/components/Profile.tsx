@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { User, Mail, Briefcase, Lock, Check, X } from "lucide-react";
+import { Lock, Check, X } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -14,16 +14,6 @@ interface ProfileProps {
 }
 
 export function Profile({ onNavigate }: ProfileProps) {
-  // User Info State
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [position, setPosition] = useState("");
-  const [company, setCompany] = useState("");
-  
-  // Store original values for cancel functionality
-  const [originalFullName, setOriginalFullName] = useState("");
-  const [originalPosition, setOriginalPosition] = useState("");
-  const [originalCompany, setOriginalCompany] = useState("");
 
   // Password State
   const [currentPassword, setCurrentPassword] = useState("");
@@ -32,37 +22,10 @@ export function Profile({ onNavigate }: ProfileProps) {
 
 
   // UI State
-  const [isEditingInfo, setIsEditingInfo] = useState(false);
   const [isEditingPassword, setIsEditingPassword] = useState(false);
-  const [isSavingInfo, setIsSavingInfo] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
-  // Load user data from storage on mount
-  useEffect(() => {
-    const storedEmail = storage.getUserEmail();
-    const storedFullName = storage.getUserFullName();
-    const storedPosition = localStorage.getItem('user_position');
-    const storedCompany = localStorage.getItem('user_company');
 
-    setEmail(storedEmail || '');
-    setFullName(storedFullName || '');
-    setPosition(storedPosition || '');
-    setCompany(storedCompany || '');
-    
-    // Store original values
-    setOriginalFullName(storedFullName || '');
-    setOriginalPosition(storedPosition || '');
-    setOriginalCompany(storedCompany || '');
-    
-    console.log('📧 Profile loaded:', { email: storedEmail, fullName: storedFullName });
-  }, []);
-
-  const handleSaveInfo = async () => {
-    // Profile update functionality removed
-    toast.error("Profile update functionality has been disabled.");
-    setIsSavingInfo(false);
-  };
 
   const handleSavePassword = async () => {
     if (newPassword !== confirmPassword) {
@@ -122,13 +85,6 @@ export function Profile({ onNavigate }: ProfileProps) {
     }
   };
 
-  const handleCancelInfo = () => {
-    setIsEditingInfo(false);
-    // Reset to original values from localStorage
-    setFullName(originalFullName);
-    setPosition(originalPosition);
-    setCompany(originalCompany);
-  };
 
   const handleCancelPassword = () => {
     setIsEditingPassword(false);
@@ -166,98 +122,6 @@ export function Profile({ onNavigate }: ProfileProps) {
 
       <div className="max-w-5xl mx-auto px-8 py-8">
         <div className="space-y-8">
-          {/* Profile Picture & Basic Info */}
-          <section className="bg-card border border-border rounded-lg p-6">
-            <div className="flex items-start justify-between mb-6">
-              <div>
-                <h2 className="text-foreground tracking-tight mb-1">Personal Information</h2>
-                <p className="text-muted-foreground tracking-tight">
-                  Update your personal details
-                </p>
-              </div>
-              {!isEditingInfo ? (
-                <Button
-                  onClick={() => setIsEditingInfo(true)}
-                  variant="outline"
-                  className="h-9 px-4 bg-card border-border hover:bg-secondary/80"
-                >
-                  Edit
-                </Button>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Button
-                    onClick={handleCancelInfo}
-                    variant="outline"
-                    className="h-9 px-4 bg-card border-border hover:bg-secondary/80"
-                  >
-                    <X className="w-4 h-4 mr-1.5" />
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleSaveInfo}
-                    disabled={isSavingInfo}
-                    className="h-9 px-4 bg-primary hover:bg-primary/90"
-                  >
-                    {isSavingInfo ? (
-                      "Saving..."
-                    ) : (
-                      <>
-                        <Check className="w-4 h-4 mr-1.5" />
-                        Save
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            {/* Form Fields */}
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-foreground">
-                  <User className="w-4 h-4 inline mr-2" />
-                  Full Name
-                </Label>
-                <Input
-                  id="fullName"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  disabled={!isEditingInfo}
-                  className="h-11 bg-input-background border-border disabled:opacity-100 disabled:cursor-default"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="position" className="text-foreground">
-                  <Briefcase className="w-4 h-4 inline mr-2" />
-                  Position
-                </Label>
-                <Input
-                  id="position"
-                  value={position}
-                  onChange={(e) => setPosition(e.target.value)}
-                  disabled={!isEditingInfo}
-                  className="h-11 bg-input-background border-border disabled:opacity-100 disabled:cursor-default"
-                />
-              </div>
-
-              <div className="space-y-2 col-span-2">
-                <Label htmlFor="email" className="text-foreground">
-                  <Mail className="w-4 h-4 inline mr-2" />
-                  Email Address
-                </Label>
-                <Input
-                  id="email"
-                  value={email}
-                  disabled
-                  className="h-11 bg-input-background border-border opacity-60 cursor-not-allowed"
-                />
-                <p className="text-muted-foreground tracking-tight">
-                  Email address cannot be changed
-                </p>
-              </div>
-            </div>
-          </section>
 
           {/* Password Change */}
           <section className="bg-card border border-border rounded-lg p-6">
