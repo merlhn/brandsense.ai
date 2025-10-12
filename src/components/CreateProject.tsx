@@ -183,6 +183,9 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
       storage.saveProject(data.project);
       storage.setCurrentProject(data.project);
 
+      // Trigger storage event to update DashboardLayout
+      window.dispatchEvent(new Event('storage'));
+
       logger.success('Project created successfully!');
       toast.success('Project Created! 🎉', {
         description: `${brandName} is now being analyzed. Click Refresh Dashboard in 2-3 minutes to see your data.`,
