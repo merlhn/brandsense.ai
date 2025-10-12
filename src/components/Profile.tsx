@@ -101,7 +101,7 @@ export function Profile({ onNavigate }: ProfileProps) {
             <div>
               <h1 className="text-foreground tracking-tight mb-1">Profile Settings</h1>
               <p className="text-muted-foreground tracking-tight">
-                Manage your account information and preferences
+                Manage your profile information and preferences
               </p>
             </div>
           </div>
