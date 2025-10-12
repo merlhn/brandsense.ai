@@ -14,7 +14,6 @@ import { Label } from "./ui/label";
 import { toast } from "sonner@2.0.3";
 import { projectId, publicAnonKey } from "../utils/supabase/info";
 import { storage } from "../lib/storage";
-import { storage } from "../lib/storage";
 
 interface FeedbackDialogProps {
   open: boolean;

@@ -63,7 +63,7 @@ export function Profile({ onNavigate }: ProfileProps) {
     try {
       const accessToken = storage.getAccessToken();
       if (!accessToken) {
-        alert("Session expired. Please sign in again.");
+        toast.error("Session expired. Please sign in again.");
         return;
       }
 
@@ -86,7 +86,7 @@ export function Profile({ onNavigate }: ProfileProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.error || 'Failed to update profile');
+        toast.error(data.error || 'Failed to update profile');
         setIsSavingInfo(false);
         return;
       }
@@ -108,18 +108,18 @@ export function Profile({ onNavigate }: ProfileProps) {
       
     } catch (error) {
       console.error('Profile update error:', error);
-      alert('Failed to update profile. Please try again.');
+      toast.error('Failed to update profile. Please try again.');
       setIsSavingInfo(false);
     }
   };
 
   const handleSavePassword = async () => {
     if (newPassword !== confirmPassword) {
-      alert("New password and confirm password do not match");
+      toast.error("New password and confirm password do not match");
       return;
     }
     if (newPassword.length < 8) {
-      alert("Password must be at least 8 characters");
+      toast.error("Password must be at least 8 characters");
       return;
     }
     
@@ -128,7 +128,7 @@ export function Profile({ onNavigate }: ProfileProps) {
     try {
       const accessToken = storage.getAccessToken();
       if (!accessToken) {
-        alert("Session expired. Please sign in again.");
+        toast.error("Session expired. Please sign in again.");
         return;
       }
 
@@ -150,7 +150,7 @@ export function Profile({ onNavigate }: ProfileProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.error || 'Failed to change password');
+        toast.error(data.error || 'Failed to change password');
         setIsSavingPassword(false);
         return;
       }
@@ -166,7 +166,7 @@ export function Profile({ onNavigate }: ProfileProps) {
       
     } catch (error) {
       console.error('Password change error:', error);
-      alert('Failed to change password. Please try again.');
+      toast.error('Failed to change password. Please try again.');
       setIsSavingPassword(false);
     }
   };
