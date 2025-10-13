@@ -41,7 +41,7 @@ export function SignIn({ onNavigate }: SignInProps) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0bmdsdWJmb3l2Znd1eHhidWdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2NzkzMjksImV4cCI6MjA3NTI1NTMyOX0.gwLdjaddi_56cL3p0IDiMb0TTJRA56B1e7d3NPmeXVQ'}`,
           },
           body: JSON.stringify({
             email: email.toLowerCase().trim(),

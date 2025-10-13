@@ -10,7 +10,7 @@ import {
 // ============================================================================
 
 // Backend API base URL - Supabase Edge Function
-const API_BASE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
+const API_BASE_URL = `${import.meta.env.VITE_SUPABASE_URL || 'https://vtnglubfoyvfwuxxbugs.supabase.co'}/functions/v1`;
 
 // Export API configuration for other components
 export const API_CONFIG = {
@@ -41,7 +41,7 @@ export const API_CONFIG = {
 function getAuthHeaders(accessToken?: string): HeadersInit {
   return {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${accessToken || import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+    'Authorization': `Bearer ${accessToken || import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0bmdsdWJmb3l2Znd1eHhidWdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2NzkzMjksImV4cCI6MjA3NTI1NTMyOX0.gwLdjaddi_56cL3p0IDiMb0TTJRA56B1e7d3NPmeXVQ'}`,
   };
 }
 
