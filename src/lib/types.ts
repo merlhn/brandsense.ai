@@ -19,6 +19,12 @@ export interface Project {
   error?: string;
 }
 
+export interface UpdateProjectResponse {
+  success: boolean;
+  message: string;
+  project: Project;
+}
+
 // ============================================================================
 // DASHBOARD DATA TYPES
 // ============================================================================

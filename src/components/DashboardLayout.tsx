@@ -798,10 +798,10 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
         {/* Main Content */}
         <MainContent
           activeItem={activeItem}
-                selectedProject={selectedProject}
+          selectedProject={selectedProject}
           onNavigate={onNavigate}
-                onDeleteProject={handleProjectDeleted}
-              />
+          onDeleteProject={handleProjectDeleted}
+        />
           </div>
 
       {/* Feedback Dialog */}

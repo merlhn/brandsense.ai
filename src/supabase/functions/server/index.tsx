@@ -25,6 +25,19 @@ if (!Deno.env.get('SUPABASE_URL') || !Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'))
 }
 
 // ============================================
+// TEST ENDPOINT (NO AUTH REQUIRED)
+// ============================================
+
+app.get('/test', (c) => {
+  console.log('🔍 TEST endpoint hit');
+  return c.json({ 
+    success: true, 
+    message: 'Test endpoint working',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// ============================================
 // PUBLIC HEALTH CHECK (NO AUTH REQUIRED)
 // ============================================
 
@@ -77,6 +90,33 @@ app.get("/", (c) => {
 
 // Enable logger
 app.use('*', logger(console.log));
+
+// Manual CORS middleware - AGGRESSIVE APPROACH
+app.use('*', async (c, next) => {
+  const origin = c.req.header('Origin') || '*';
+  
+  // Handle preflight
+  if (c.req.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+        'Access-Control-Max-Age': '86400',
+        'Access-Control-Allow-Credentials': 'true',
+      },
+    });
+  }
+  
+  await next();
+  
+  // Add CORS headers to response
+  c.header('Access-Control-Allow-Origin', '*');
+  c.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  c.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  c.header('Access-Control-Allow-Credentials', 'true');
+});
 
 // ============================================
 // USER PROFILE UPDATE ROUTE
@@ -1181,96 +1221,6 @@ app.delete('/make-server-cf9a9609/projects/:id', async (c) => {
   }
 });
 
-/**
- * PUT /make-server-cf9a9609/projects/:id
- * Headers: Authorization: Bearer <access_token>
- * Body: { name, market, language, description, industry, websiteUrl }
- */
-app.put('/make-server-cf9a9609/projects/:id', async (c) => {
-  try {
-    const authHeader = c.req.header('Authorization');
-    
-    if (!authHeader) {
-      return c.json({ 
-        code: 401,
-        error: 'Missing authorization header',
-        message: 'Please sign in to update project' 
-      }, 401);
-    }
-    
-    const accessToken = authHeader.split(' ')[1];
-    const projectId = c.req.param('id');
-    
-    if (!projectId) {
-      return c.json({ 
-        error: 'Project ID is required' 
-      }, 400);
-    }
-
-    const body = await c.req.json();
-    const { name, market, language, description, industry, websiteUrl } = body;
-
-    // Validate required fields
-    if (!name || !market || !language) {
-      return c.json({ 
-        error: 'Missing required fields: name, market, language' 
-      }, 400);
-    }
-
-    const supabase = getSupabaseClient(accessToken);
-
-    // Check if project exists and belongs to user
-    const { data: existingProject, error: checkError } = await supabase
-      .from('projects')
-      .select('id, user_id')
-      .eq('id', projectId)
-      .single();
-
-    if (checkError || !existingProject) {
-      return c.json({ 
-        error: 'Project not found' 
-      }, 404);
-    }
-
-    // Update project
-    const { data: updatedProject, error: updateError } = await supabase
-      .from('projects')
-      .update({
-        name: name.trim(),
-        market: market.trim(),
-        language: language.trim(),
-        description: description?.trim() || null,
-        industry: industry?.trim() || null,
-        website_url: websiteUrl?.trim() || null,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', projectId)
-      .select()
-      .single();
-
-    if (updateError) {
-      console.error('Project update error:', updateError);
-      return c.json({ 
-        error: updateError.message || 'Failed to update project' 
-      }, 500);
-    }
-
-    console.log('✅ Project updated successfully:', updatedProject.name);
-
-    return c.json({ 
-      success: true,
-      message: 'Project updated successfully',
-      project: updatedProject
-    });
-
-  } catch (error) {
-    console.error('Project update endpoint error:', error);
-    return c.json({ 
-      error: 'Internal server error during project update' 
-    }, 500);
-  }
-});
-
 // Get single project with data
 app.get('/make-server-cf9a9609/projects/:id', async (c) => {
   try {
@@ -1620,46 +1570,6 @@ app.post('/make-server-cf9a9609/feedback', async (c) => {
   }
 });
 
-// Enable CORS for all routes and methods - MOVED TO BOTTOM
-app.use(
-  "/*",
-  cors({
-    origin: [
-      "https://brandsense-ai.vercel.app",
-      "https://brandsense-ai-git-main-mer-lhans-projects.vercel.app",
-      "https://brandsense-hgkj1kgvq-mer-lhans-projects.vercel.app",
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "http://localhost:3002"
-    ],
-    allowHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    exposeHeaders: ["Content-Length", "X-Total-Count"],
-    maxAge: 86400, // 24 hours
-    credentials: true,
-  }),
-);
-
-// Handle preflight requests explicitly
-app.options("/*", (c) => {
-  const origin = c.req.header('Origin');
-  const allowedOrigins = [
-    "https://brandsense-ai.vercel.app",
-    "https://brandsense-ai-git-main-mer-lhans-projects.vercel.app",
-    "https://brandsense-hgkj1kgvq-mer-lhans-projects.vercel.app",
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "http://localhost:3002"
-  ];
-  
-  const allowedOrigin = allowedOrigins.includes(origin || '') ? origin : allowedOrigins[0];
-  
-  return c.text("", 200, {
-    "Access-Control-Allow-Origin": allowedOrigin,
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
-    "Access-Control-Max-Age": "86400",
-  });
-});
+// CORS is now handled by manual middleware above
 
 Deno.serve(app.fetch);

@@ -23,6 +23,7 @@ import { toast } from "sonner@2.0.3";
 interface ProjectSettingsProps {
   onNavigate?: (screen: string) => void;
   onDeleteProject?: () => void;
+  onProjectUpdated?: (project: Project) => void;
   selectedProject: Project;
 }
 
@@ -51,7 +52,7 @@ const languages = [
   { value: "portuguese", label: "Portuguese" },
 ];
 
-export function ProjectSettings({ onNavigate, onDeleteProject, selectedProject }: ProjectSettingsProps) {
+export function ProjectSettings({ onNavigate, onDeleteProject, onProjectUpdated, selectedProject }: ProjectSettingsProps) {
   console.log('🔍 ProjectSettings - Component mounted');
   console.log('🔍 ProjectSettings - selectedProject:', selectedProject ? 'Present' : 'Missing');
   console.log('🔍 ProjectSettings - selectedProject ID:', selectedProject?.id);
@@ -414,6 +415,7 @@ export function ProjectSettings({ onNavigate, onDeleteProject, selectedProject }
           </section>
         </div>
       </div>
+      
     </div>
   );
 }
