@@ -5,14 +5,31 @@ import {
   ChatGPTResponse,
   ProjectData,
 } from './types';
-import { projectId, publicAnonKey } from '../utils/supabase/info';
-
 // ============================================================================
 // API CONFIGURATION
 // ============================================================================
 
 // Backend API base URL - Supabase Edge Function
-const API_BASE_URL = `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609`;
+const API_BASE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
+
+// Export API configuration for other components
+export const API_CONFIG = {
+  BASE_URL: API_BASE_URL,
+  ENDPOINTS: {
+    AUTH: {
+      SIGNUP: '/make-server-cf9a9609/auth/signup',
+      SIGNIN: '/make-server-cf9a9609/auth/signin',
+      CHANGE_PASSWORD: '/make-server-cf9a9609/auth/change-password',
+    },
+    PROJECTS: {
+      LIST: '/make-server-cf9a9609/projects',
+      CREATE: '/make-server-cf9a9609/projects/create',
+      GET: (id: string) => `/make-server-cf9a9609/projects/${id}`,
+      REFRESH: '/make-server-cf9a9609/projects/refresh',
+    },
+    FEEDBACK: '/make-server-cf9a9609/feedback',
+  }
+};
 
 // ============================================================================
 // API HELPERS
@@ -24,7 +41,7 @@ const API_BASE_URL = `https://${projectId}.supabase.co/functions/v1/make-server-
 function getAuthHeaders(accessToken?: string): HeadersInit {
   return {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${accessToken || publicAnonKey}`,
+    'Authorization': `Bearer ${accessToken || import.meta.env.VITE_SUPABASE_ANON_KEY}`,
   };
 }
 
@@ -33,7 +50,7 @@ function getAuthHeaders(accessToken?: string): HeadersInit {
  */
 function getAccessToken(): string | null {
   // Try to get from localStorage (set during sign in)
-  return localStorage.getItem('auth_access_token');
+  return localStorage.getItem('access_token');
 }
 
 // ============================================================================

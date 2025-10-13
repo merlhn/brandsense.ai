@@ -5,7 +5,7 @@ import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
 import { AlertCircle, Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner@2.0.3";
-import { projectId, publicAnonKey } from "../utils/supabase/info";
+import { API_CONFIG } from "../lib/api";
 import { storage } from "../lib/storage";
 import { logger } from "../lib/logger";
 import { SCREENS } from "../lib/constants";
@@ -36,12 +36,12 @@ export function SignIn({ onNavigate }: SignInProps) {
     
     try {
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/auth/signin`,
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.SIGNIN}`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${publicAnonKey}`,
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           },
           body: JSON.stringify({
             email: email.toLowerCase().trim(),
@@ -92,7 +92,7 @@ export function SignIn({ onNavigate }: SignInProps) {
       logger.sync('Fetching projects from backend...');
       try {
         const projectsResponse = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/projects`,
+          `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROJECTS.LIST}`,
           {
             headers: {
               'Authorization': `Bearer ${data.accessToken}`,

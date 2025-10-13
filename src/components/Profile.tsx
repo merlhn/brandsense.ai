@@ -6,7 +6,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
 import { storage } from "../lib/storage";
-import { projectId } from "../utils/supabase/info";
+import { API_CONFIG } from "../lib/api";
 import { toast } from "sonner@2.0.3";
 
 interface ProfileProps {
@@ -65,7 +65,7 @@ export function Profile({ onNavigate }: ProfileProps) {
       }
 
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/auth/change-password`,
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.CHANGE_PASSWORD}`,
         {
           method: 'POST',
           headers: {

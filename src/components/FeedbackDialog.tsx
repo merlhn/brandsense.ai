@@ -12,7 +12,7 @@ import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
 import { toast } from "sonner@2.0.3";
-import { projectId, publicAnonKey } from "../utils/supabase/info";
+import { API_CONFIG } from "../lib/api";
 import { storage } from "../lib/storage";
 
 interface FeedbackDialogProps {
@@ -43,12 +43,12 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
       const userName = storage.getUserFullName() || 'Anonymous User';
 
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/feedback`,
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.FEEDBACK}`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${publicAnonKey}`,
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           },
           body: JSON.stringify({
             feedback: feedback.trim(),

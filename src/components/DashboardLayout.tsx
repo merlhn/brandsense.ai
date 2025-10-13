@@ -7,7 +7,7 @@ import { Sidebar } from "./layout/Sidebar";
 import { Header } from "./layout/Header";
 import { MainContent } from "./layout/MainContent";
 import { storage } from "../lib/storage";
-import { projectId, publicAnonKey } from "../utils/supabase/info";
+import { API_CONFIG } from "../lib/api";
 import { logger } from "../lib/logger";
 import { SCREENS } from "../lib/constants";
 import { Project } from "../lib/types";
@@ -237,7 +237,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       
       try {
         const response = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/projects`,
+          `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROJECTS.LIST}`,
           {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
@@ -337,7 +337,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
         console.log(`📡 Fetching project data for: ${selectedProject.id}`);
         
         const response = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/projects/${selectedProject.id}`,
+          `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROJECTS.GET(selectedProject.id)}`,
           {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
@@ -482,7 +482,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       
       // Call backend API to refresh project
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/projects/refresh`,
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROJECTS.REFRESH}`,
         {
           method: 'POST',
           headers: {
@@ -518,7 +518,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
         const pollInterval = setInterval(async () => {
           try {
             const statusResponse = await fetch(
-              `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/projects/${selectedProject.id}`,
+              `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROJECTS.GET(selectedProject.id)}`,
               {
                 headers: {
                   'Authorization': `Bearer ${accessToken}`,
@@ -590,7 +590,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       
       // Fetch fresh data from backend
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/projects`,
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROJECTS.LIST}`,
         {
           headers: {
             'Authorization': `Bearer ${accessToken}`,

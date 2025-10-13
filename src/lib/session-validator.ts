@@ -6,7 +6,7 @@
  */
 
 import { storage } from './storage';
-import { projectId } from '../utils/supabase/info';
+import { API_CONFIG } from './api';
 import { logger } from './logger';
 import { SCREENS, type Screen } from './constants';
 import type { Project } from './types';
@@ -78,7 +78,7 @@ export async function validateUserSession(): Promise<ValidationResult> {
     logger.info('Validating token with backend...');
     
     const response = await fetch(
-      `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/projects`,
+      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROJECTS.LIST}`,
       {
         headers: {
           'Authorization': `Bearer ${accessToken}`,

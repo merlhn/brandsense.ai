@@ -4,7 +4,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
 import { AlertCircle, Loader2, CheckCircle, Sparkles } from "lucide-react";
-import { projectId, publicAnonKey } from "../utils/supabase/info";
+import { API_CONFIG } from "../lib/api";
 import { storage } from "../lib/storage";
 import { logger } from "../lib/logger";
 import { SCREENS } from "../lib/constants";
@@ -140,7 +140,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
       }
 
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/projects/create`,
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROJECTS.CREATE}`,
         {
           method: 'POST',
           headers: {

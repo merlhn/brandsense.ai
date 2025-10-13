@@ -309,9 +309,9 @@ app.post("/make-server-cf9a9609/auth/signup", async (c) => {
       email: email.toLowerCase().trim(),
       password,
       email_confirm: true, // Auto-confirm email (no verification in MVP)
-      user_metadata: {
-        full_name: fullName,
-      },
+        user_metadata: {
+          fullName: fullName,
+        },
     });
 
     if (error) {
@@ -339,7 +339,7 @@ app.post("/make-server-cf9a9609/auth/signup", async (c) => {
       .insert({
         id: data.user.id,
         email: email.toLowerCase().trim(),
-        full_name: fullName,
+        fullName: fullName,
       });
 
     if (profileError) {
@@ -460,7 +460,7 @@ app.post("/make-server-cf9a9609/auth/signin", async (c) => {
         .insert({
           id: data.user.id,
           email: data.user.email,
-          full_name: data.user.user_metadata?.full_name || null,
+          fullName: data.user.user_metadata?.fullName || null,
         });
 
       if (insertError) {
@@ -496,7 +496,7 @@ app.post("/make-server-cf9a9609/auth/signin", async (c) => {
       user: {
         id: data.user.id,
         email: data.user.email,
-        fullName: data.user.user_metadata?.full_name,
+        fullName: data.user.user_metadata?.fullName,
       }
     });
 
@@ -557,7 +557,7 @@ app.get("/make-server-cf9a9609/auth/session", async (c) => {
       user: {
         id: user.id,
         email: user.email,
-        fullName: user.user_metadata?.full_name,
+        fullName: user.user_metadata?.fullName,
       }
     });
 
@@ -1624,19 +1624,38 @@ app.post('/make-server-cf9a9609/feedback', async (c) => {
 app.use(
   "/*",
   cors({
-    origin: "*",
+    origin: [
+      "https://brandsense-ai.vercel.app",
+      "https://brandsense-ai-git-main-mer-lhans-projects.vercel.app",
+      "https://brandsense-hgkj1kgvq-mer-lhans-projects.vercel.app",
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "http://localhost:3002"
+    ],
     allowHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     exposeHeaders: ["Content-Length", "X-Total-Count"],
     maxAge: 86400, // 24 hours
-    credentials: false,
+    credentials: true,
   }),
 );
 
 // Handle preflight requests explicitly
 app.options("/*", (c) => {
+  const origin = c.req.header('Origin');
+  const allowedOrigins = [
+    "https://brandsense-ai.vercel.app",
+    "https://brandsense-ai-git-main-mer-lhans-projects.vercel.app",
+    "https://brandsense-hgkj1kgvq-mer-lhans-projects.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:3002"
+  ];
+  
+  const allowedOrigin = allowedOrigins.includes(origin || '') ? origin : allowedOrigins[0];
+  
   return c.text("", 200, {
-    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
     "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
     "Access-Control-Max-Age": "86400",

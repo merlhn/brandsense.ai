@@ -315,7 +315,6 @@ export function isValidUUID(id: string): boolean {
  */
 export function clearAllAndRestoreAuth(accessToken: string, email?: string, fullName?: string): void {
   localStorage.clear();
-  localStorage.setItem('auth_access_token', accessToken);
   localStorage.setItem('access_token', accessToken);
   
   // Restore user info if provided

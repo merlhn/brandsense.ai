@@ -59,5 +59,4 @@ export const TIMEFRAMES = {
 
 export const AUTH_TOKEN_KEYS = {
   ACCESS_TOKEN: 'access_token',
-  AUTH_ACCESS_TOKEN: 'auth_access_token',
 } as const;

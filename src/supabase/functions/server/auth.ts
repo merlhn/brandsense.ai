@@ -60,7 +60,7 @@ export function setupAuthRoutes(app: Hono) {
         password,
         email_confirm: true, // Auto-confirm for now
         user_metadata: {
-          full_name: fullName.trim(),
+          fullName: fullName.trim(),
         }
       });
 
@@ -76,7 +76,7 @@ export function setupAuthRoutes(app: Hono) {
         .insert({
           id: data.user.id,
           email: data.user.email,
-          full_name: fullName.trim(),
+          fullName: fullName.trim(),
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         });
@@ -133,7 +133,7 @@ export function setupAuthRoutes(app: Hono) {
       // Get user profile
       const { data: profile } = await supabase
         .from('users')
-        .select('full_name, position, company')
+        .select('fullName, position, company')
         .eq('id', data.user.id)
         .single();
 
@@ -145,7 +145,7 @@ export function setupAuthRoutes(app: Hono) {
         user: {
           id: data.user.id,
           email: data.user.email,
-          fullName: profile?.full_name || data.user.user_metadata?.full_name || '',
+          fullName: profile?.fullName || data.user.user_metadata?.fullName || '',
           position: profile?.position || null,
           company: profile?.company || null
         }

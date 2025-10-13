@@ -17,7 +17,7 @@ import {
 } from "./ui/alert-dialog";
 import { Project } from "../lib/types";
 import { storage } from "../lib/storage";
-import { projectId, publicAnonKey } from "../utils/supabase/info";
+import { API_CONFIG } from "../lib/api";
 import { toast } from "sonner@2.0.3";
 
 interface ProjectSettingsProps {
@@ -131,7 +131,7 @@ export function ProjectSettings({ onNavigate, onDeleteProject, selectedProject }
       console.log('   Project Name:', selectedProject.name);
       
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-cf9a9609/projects/${selectedProject.id}`,
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROJECTS.GET(selectedProject.id)}`,
         {
           method: 'DELETE',
           headers: {
