@@ -30,17 +30,22 @@ export function Header({
       <header className="bg-card border-b border-border/50 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <h2 className="text-foreground tracking-tight text-[18px] font-semibold">
-              {selectedProject ? selectedProject.name : 'Dashboard'}
-            </h2>
+            <div className="w-8 h-8 flex items-center justify-center">
+              {/* Placeholder for alignment */}
+            </div>
+            <div>
+              <h2 className="text-foreground tracking-tight text-[14px] font-semibold">
+                {selectedProject ? selectedProject.name : 'Dashboard'}
+              </h2>
             {selectedProject && (
               <div className="flex items-center gap-2 text-muted-foreground">
-                <span className="text-[13px]">•</span>
-                <span className="text-[13px]">{selectedProject.market}</span>
-                <span className="text-[13px]">•</span>
-                <span className="text-[13px]">{selectedProject.language}</span>
+                <span className="text-[10px]">•</span>
+                <span className="text-[10px]">{selectedProject.market}</span>
+                <span className="text-[10px]">•</span>
+                <span className="text-[10px]">{selectedProject.language}</span>
               </div>
             )}
+            </div>
           </div>
           
           <div className="flex items-center gap-3">
