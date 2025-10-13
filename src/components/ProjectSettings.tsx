@@ -101,11 +101,11 @@ export function ProjectSettings({ onNavigate, onDeleteProject, onProjectUpdated,
     `Comprehensive brand monitoring and sentiment analysis for ${selectedProject?.name || "Nike"} in the ${selectedProject?.market || "Turkish market"}.`;
   
   const createdDate = selectedProject?.createdAt 
-    ? new Date(selectedProject.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-    : "January 15, 2025";
+    ? new Date(selectedProject.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + new Date(selectedProject.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    : "January 15, 2025 10:30 AM";
   const lastUpdated = selectedProject?.lastRefreshAt 
-    ? new Date(selectedProject.lastRefreshAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-    : "February 28, 2025";
+    ? new Date(selectedProject.lastRefreshAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + new Date(selectedProject.lastRefreshAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    : "February 28, 2025 2:45 PM";
   const aiModel = selectedProject?.aiModel || "GPT-4o";
 
   // No save function needed for read-only view

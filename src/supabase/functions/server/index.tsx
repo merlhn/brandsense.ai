@@ -956,6 +956,7 @@ Include diverse keywords covering: product categories, brand attributes, themes,
 
 
 
+
 // Background analysis function
 async function analyzeBrandInBackground(
   projectId: string,
@@ -1569,6 +1570,7 @@ app.post('/make-server-cf9a9609/feedback', async (c) => {
     return c.json({ error: 'Internal server error' }, 500);
   }
 });
+
 
 // CORS is now handled by manual middleware above
 

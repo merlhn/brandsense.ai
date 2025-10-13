@@ -140,47 +140,6 @@ export async function analyzeProject(
   }
 }
 
-/**
- * Generate risk report with ChatGPT
- */
-export async function generateRiskReport(
-  project: Project
-): Promise<ChatGPTResponse<string>> {
-  const accessToken = getAccessToken();
-  
-  if (!accessToken) {
-    console.error('No access token - user must be signed in');
-    throw new Error('User must be signed in to generate report');
-  }
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/reports/generate`, {
-      method: 'POST',
-      headers: getAuthHeaders(accessToken),
-      body: JSON.stringify({
-        projectId: project.id,
-        language: project.language,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-      console.error('Report generation failed:', errorData);
-      throw new Error(errorData.error || `HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    return {
-      success: true,
-      data: data.report?.content || '',
-      timestamp: new Date().toISOString(),
-    };
-  } catch (error) {
-    console.error('API Error:', error);
-    throw error;
-  }
-}
 
 /**
  * Refresh project data (manual refresh by user)
