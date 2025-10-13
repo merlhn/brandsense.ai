@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { toast } from "sonner@2.0.3";
 import { refreshProjectData } from "../lib/api";
 import { FeedbackDialog } from "./FeedbackDialog";
+import { CreateProjectModal } from "./CreateProjectModal";
 import { Sidebar } from "./layout/Sidebar";
 import { Header } from "./layout/Header";
 import { MainContent } from "./layout/MainContent";
@@ -102,6 +103,8 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
   };
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
+  const [showCreateProject, setShowCreateProject] = useState(false);
+  const [isLoadingProjectData, setIsLoadingProjectData] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showDataCorruptionDialog, setShowDataCorruptionDialog] = useState(false);
   const [userEmail, setUserEmail] = useState(() => {
@@ -217,23 +220,16 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     };
   }, []);
 
-  // Validate projects exist in backend on mount
+  // Sync projects from backend on mount
   useEffect(() => {
-    const validateProjects = async () => {
+    const syncProjectsFromBackend = async () => {
       const accessToken = storage.getAccessToken();
       if (!accessToken) {
-        // This shouldn't happen due to auth guard above, but just in case
-        logger.warning('No access token during project validation');
+        logger.warning('No access token during project sync');
         return;
       }
 
-      const localProjects = storage.getAllProjects();
-      if (localProjects.length === 0) {
-        console.log('📍 No local projects to validate');
-        return;
-      }
-
-      console.log('🔍 Validating projects against backend...');
+      console.log('🔄 Syncing projects from backend...');
       
       try {
         const response = await fetch(
@@ -251,45 +247,27 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
           
           console.log(`✅ Backend has ${backendProjects.length} projects`);
           
-          // Check if any local projects are missing from backend
-          const localProjectIds = localProjects.map(p => p.id);
-          const backendProjectIds = backendProjects.map((p: any) => p.id);
+          // Update local storage with backend projects
+          storage.saveProjects(backendProjects);
           
-          const missingProjects = localProjectIds.filter(id => !backendProjectIds.includes(id));
+          // Update projects state
+          setProjects(backendProjects);
           
-          if (missingProjects.length > 0) {
-            console.log(`⚠️ Found ${missingProjects.length} local projects not in backend:`, missingProjects);
-            
-            // Remove missing projects from local storage
-            missingProjects.forEach(id => {
-              storage.deleteProject(id);
-              console.log(`🗑️ Removed missing project: ${id}`);
-            });
-            
-            // Update projects state
-            const updatedProjects = storage.getAllProjects();
-            setProjects(updatedProjects);
-            
-            // Update selected project if it was deleted
-            if (selectedProject && missingProjects.includes(selectedProject.id)) {
-              if (updatedProjects.length > 0) {
-                storage.setCurrentProject(updatedProjects[0]);
-                setSelectedProject(updatedProjects[0]);
-              } else {
-                storage.clearCurrentProject();
-                setSelectedProject(null);
-              }
-              }
-            }
-          } else {
-          console.log('⚠️ Could not validate projects with backend');
+          // Set current project if none selected
+          if (!selectedProject && backendProjects.length > 0) {
+            storage.setCurrentProject(backendProjects[0]);
+            setSelectedProject(backendProjects[0]);
+          }
+          
+        } else {
+          console.log('⚠️ Could not sync projects with backend');
         }
       } catch (error) {
-        console.log('⚠️ Error validating projects:', error);
+        console.log('⚠️ Error syncing projects:', error);
       }
     };
 
-    validateProjects();
+    syncProjectsFromBackend();
   }, []);
 
   // Auto-dismiss onboarding banner after 2 seconds if data is ready
@@ -679,6 +657,80 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     }
   };
 
+  const handleCreateProject = () => {
+    setShowCreateProject(true);
+  };
+
+  const handleProjectCreated = (newProject: Project) => {
+    // Add to projects list
+    const updatedProjects = [...projects, newProject];
+    setProjects(updatedProjects);
+    
+    // Set as current project
+    setSelectedProject(newProject);
+    storage.setCurrentProject(newProject);
+    storage.saveProject(newProject);
+    
+    // Trigger storage event
+    window.dispatchEvent(new Event('storage'));
+    
+    // Close modal
+    setShowCreateProject(false);
+    
+    // Success toast
+    toast.success('Project Created! 🎉', {
+      description: `${newProject.name} is now being analyzed.`,
+    });
+  };
+
+  const switchToProject = (project: Project) => {
+    // Update selected project
+    setSelectedProject(project);
+    storage.setCurrentProject(project);
+    
+    // Show loading while fetching data
+    setIsLoadingProjectData(true);
+    
+    // Fetch project data
+    loadProjectData(project.id);
+    
+    // Success feedback
+    toast.success(`Switched to ${project.name}`);
+  };
+
+  const loadProjectData = async (projectId: string) => {
+    try {
+      const accessToken = storage.getAccessToken();
+      if (!accessToken) {
+        toast.error('Session expired. Please sign in again.');
+        onNavigate?.(SCREENS.SIGN_IN);
+        return;
+      }
+
+      const response = await fetch(
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROJECTS.GET(projectId)}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.project) {
+          setSelectedProject(data.project);
+          storage.setCurrentProject(data.project);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading project data:', error);
+      toast.error('Failed to load project data');
+    } finally {
+      setIsLoadingProjectData(false);
+    }
+  };
+
 
   // Debug logs for troubleshooting
   console.log('🔍 DashboardLayout - selectedProject:', selectedProject ? 'Present' : 'Missing');
@@ -704,7 +756,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
             Please select a project to view the dashboard.
           </p>
           <button
-            onClick={() => onNavigate?.(SCREENS.ONBOARDING_BRAND)}
+            onClick={handleCreateProject}
             className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             Create Project
@@ -726,10 +778,8 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
         onLogout={() => setShowLogoutDialog(true)}
         projects={projects}
         selectedProject={selectedProject}
-        onProjectSelect={(project) => {
-          storage.setCurrentProject(project);
-          setSelectedProject(project);
-        }}
+        onProjectSelect={switchToProject}
+        onCreateProject={handleCreateProject}
       />
 
       {/* Main Content Area */}
@@ -758,6 +808,14 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       <FeedbackDialog 
         open={showFeedbackDialog}
         onOpenChange={setShowFeedbackDialog}
+      />
+
+      {/* Create Project Modal */}
+      <CreateProjectModal
+        isOpen={showCreateProject}
+        onClose={() => setShowCreateProject(false)}
+        onProjectCreated={handleProjectCreated}
+        onNavigate={onNavigate}
       />
 
       {/* Data Corruption Recovery Dialog */}
