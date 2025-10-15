@@ -8,6 +8,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 
+## [1.0.1] - "Create Project Modal Fix" - 2025-01-08
+
+### 🐛 Bug Fixes
+
+#### Critical Modal Rendering Issue
+- **Fixed:** CreateProjectModal not rendering when no projects exist
+- **Impact:** Users can now create their first project successfully
+- **Technical:** Added modal to no-project case in DashboardLayout.tsx
+
+#### UI Text Improvements
+- **Updated:** "No Project Selected" → "No Project"
+- **Updated:** Tagline to "Please create a project to monitor your brand"
+- **Result:** More concise and clear user messaging
+
+#### Button Functionality
+- **Fixed:** All Create Project buttons now functional
+- **Fixed:** Main "Create New Project" button
+- **Fixed:** Sidebar "+ New" button
+- **Result:** Complete project creation workflow
+
+### 🔧 Technical Changes
+- Modified `src/components/DashboardLayout.tsx`
+- Removed debug logs and test elements
+- Simplified handleCreateProject function
+- Enhanced modal rendering logic
+
+### ✅ Testing
+- All Create Project buttons tested and working
+- Modal opens correctly in no-project state
+- Project creation completes successfully
+- User redirected to dashboard after creation
+
+---
+
 ## [1.0.0] - "Foundation" - 2025-01-08
 
 ### 🎉 First Production Release
