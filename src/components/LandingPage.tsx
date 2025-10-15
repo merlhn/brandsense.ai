@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { motion } from "motion/react";
 import { 
   Sparkles, 
@@ -15,7 +15,11 @@ import {
   Users,
   Quote,
   Circle,
-  Check
+  Check,
+  TrendingDown,
+  Minus,
+  Heart,
+  Info
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { BrandLogo } from "./BrandLogo";
@@ -179,160 +183,56 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center max-w-4xl mx-auto"
+            className="max-w-4xl mx-auto text-center"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-primary tracking-tight" style={{ fontSize: '13px', fontWeight: 500 }}>Powered by GPT-4o</span>
-            </div>
-            
-            <h1 className="text-foreground mb-6 tracking-tight" style={{ fontSize: '56px', lineHeight: '1.1', fontWeight: 600 }}>
-              Monitor Your Brand Visibility
-              <br />
-              <span className="text-primary">in AI Conversations</span>
-            </h1>
-            
-            <p className="text-muted-foreground mb-4 max-w-2xl mx-auto" style={{ fontSize: '20px', lineHeight: '1.6' }}>
-              Understand how ChatGPT and AI models perceive your brand. Get actionable insights 
-              on sentiment, identity, keywords, and brand positioning.
-            </p>
-            
-            <p className="text-muted-foreground mb-8 max-w-2xl mx-auto" style={{ fontSize: '16px', lineHeight: '1.6' }}>
-              As millions of people use AI assistants to research products, services, and brands, 
-              your AI visibility determines whether you're part of the conversation or invisible. 
-              Brand Sense helps you measure, understand, and improve how AI models represent your brand.
-            </p>
-            
-            <div className="flex items-center justify-center gap-4">
-              <Button
-                onClick={() => onNavigate("signup")}
-                className="bg-primary hover:bg-primary/90 text-[rgba(255,255,255,1)] px-6 py-3"
-              >
-                Start Monitoring
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="border-border text-foreground hover:bg-secondary"
-              >
-                See Examples
-              </Button>
+            <div className="space-y-6">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 w-fit">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span className="text-primary tracking-tight" style={{ fontSize: '13px', fontWeight: 500 }}>Powered by GPT-4o</span>
+                </div>
+              </div>
+              
+              <h1 className="text-foreground tracking-tight" style={{ fontSize: '56px', lineHeight: '1.1', fontWeight: 600 }}>
+                Monitor Your Brand Visibility
+                <br />
+                <span className="text-primary">in AI Conversations</span>
+              </h1>
+              
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                Understand how ChatGPT and AI models perceive your brand. Get actionable insights 
+                on sentiment, identity, keywords, and brand positioning.
+              </p>
+              
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                As millions of people use AI assistants to research products, services, and brands, 
+                your AI visibility determines whether you're part of the conversation or invisible. 
+                Brand Sense helps you measure, understand, and improve how AI models represent your brand.
+              </p>
+              
+              <div className="flex items-center justify-center gap-4">
+                <Button
+                  onClick={() => onNavigate("signup")}
+                  className="bg-primary hover:bg-primary/90 text-[rgba(255,255,255,1)] px-6 py-3"
+                >
+                  Start Monitoring
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="border-border text-foreground hover:bg-secondary"
+                >
+                  See Examples
+                </Button>
+              </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Why It Matters Section */}
-      <section className="py-20 px-6 border-t border-border/50 bg-card/30">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-foreground mb-4 tracking-tight" style={{ fontSize: '40px', fontWeight: 600 }}>
-              Why AI brand monitoring matters
-            </h2>
-            <p className="text-muted-foreground max-w-3xl mx-auto" style={{ fontSize: '18px', lineHeight: '1.7' }}>
-              The way consumers discover and research brands is fundamentally changing. Traditional search engines are being replaced by AI assistants that don't just index information—they interpret, synthesize, and recommend.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="p-6 rounded-lg bg-card border border-border"
-            >
-              <div className="w-12 h-12 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-destructive" />
-              </div>
-              <h3 className="text-foreground mb-3 tracking-tight" style={{ fontSize: '18px', fontWeight: 600 }}>
-                The Problem
-              </h3>
-              <p className="text-muted-foreground mb-3" style={{ fontSize: '14px', lineHeight: '1.7' }}>
-                When someone asks ChatGPT "What's the best coffee brand?" or "Which athletic shoe brand is most innovative?", you have zero visibility into:
-              </p>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2.5 text-muted-foreground" style={{ fontSize: '13px', lineHeight: '1.5' }}>
-                  <Circle className="w-1.5 h-1.5 fill-destructive text-destructive shrink-0" />
-                  <span>Whether your brand is mentioned at all</span>
-                </li>
-                <li className="flex items-center gap-2.5 text-muted-foreground" style={{ fontSize: '13px', lineHeight: '1.5' }}>
-                  <Circle className="w-1.5 h-1.5 fill-destructive text-destructive shrink-0" />
-                  <span>How you're positioned vs. competitors</span>
-                </li>
-                <li className="flex items-center gap-2.5 text-muted-foreground" style={{ fontSize: '13px', lineHeight: '1.5' }}>
-                  <Circle className="w-1.5 h-1.5 fill-destructive text-destructive shrink-0" />
-                  <span>What keywords trigger your brand mention</span>
-                </li>
-                <li className="flex items-center gap-2.5 text-muted-foreground" style={{ fontSize: '13px', lineHeight: '1.5' }}>
-                  <Circle className="w-1.5 h-1.5 fill-destructive text-destructive shrink-0" />
-                  <span>Sentiment and perception patterns</span>
-                </li>
-              </ul>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="p-6 rounded-lg bg-card border border-border"
-            >
-              <div className="w-12 h-12 rounded-lg bg-success/10 border border-success/20 flex items-center justify-center mb-4">
-                <CheckCircle2 className="w-6 h-6 text-success" />
-              </div>
-              <h3 className="text-foreground mb-3 tracking-tight" style={{ fontSize: '18px', fontWeight: 600 }}>
-                The Solution
-              </h3>
-              <p className="text-muted-foreground mb-3" style={{ fontSize: '14px', lineHeight: '1.7' }}>
-                Brand Sense analyzes exactly how AI models perceive and present your brand, giving you:
-              </p>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2.5 text-muted-foreground" style={{ fontSize: '13px', lineHeight: '1.5' }}>
-                  <Check className="w-4 h-4 text-success shrink-0" />
-                  <span>Comprehensive brand identity mapping</span>
-                </li>
-                <li className="flex items-center gap-2.5 text-muted-foreground" style={{ fontSize: '13px', lineHeight: '1.5' }}>
-                  <Check className="w-4 h-4 text-success shrink-0" />
-                  <span>Real-time sentiment analysis across topics</span>
-                </li>
-                <li className="flex items-center gap-2.5 text-muted-foreground" style={{ fontSize: '13px', lineHeight: '1.5' }}>
-                  <Check className="w-4 h-4 text-success shrink-0" />
-                  <span>Keyword association intelligence</span>
-                </li>
-                <li className="flex items-center gap-2.5 text-muted-foreground" style={{ fontSize: '13px', lineHeight: '1.5' }}>
-                  <Check className="w-4 h-4 text-success shrink-0" />
-                  <span>Actionable insights for positioning strategy</span>
-                </li>
-              </ul>
-            </motion.div>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-12 p-8 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 max-w-4xl mx-auto text-center"
-          >
-            <p className="text-foreground mb-4" style={{ fontSize: '20px', lineHeight: '1.6', fontWeight: 500 }}>
-              "By 2025, over 60% of product research will start with AI assistants, not search engines."
-            </p>
-            <p className="text-muted-foreground" style={{ fontSize: '14px' }}>
-              If your brand isn't optimized for AI visibility, you're invisible to the next generation of consumers.
-            </p>
-          </motion.div>
-        </div>
-      </section>
 
       {/* Features Grid */}
       <section className="py-20 px-6 border-t border-border/50">
@@ -354,7 +254,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <motion.div
                 key={feature.title}
@@ -362,67 +262,135 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="p-6 rounded-lg bg-card border border-border hover:border-primary/30 transition-all duration-300"
+                className="group p-6 rounded-xl bg-card border border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-pointer"
               >
-                <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-primary" />
+                <div className="w-14 h-14 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
+                  <feature.icon className="w-7 h-7 text-primary group-hover:text-primary/80" />
                 </div>
-                <h3 className="text-foreground mb-2 tracking-tight" style={{ fontSize: '18px', fontWeight: 600 }}>
+                <h3 className="text-foreground mb-3 tracking-tight group-hover:text-primary transition-colors duration-300" style={{ fontSize: '20px', fontWeight: 600 }}>
                   {feature.title}
                 </h3>
-                <p className="text-muted-foreground" style={{ fontSize: '14px', lineHeight: '1.6' }}>
+                <p className="text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300 mb-4" style={{ fontSize: '15px', lineHeight: '1.6' }}>
                   {feature.description}
                 </p>
+                
+                {/* Mini Dashboard Preview */}
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="bg-card/50 rounded-lg p-3 border border-border/30">
+                    {feature.title === "AI-Powered Analysis" && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">BPM Score</span>
+                          <span className="text-xs font-bold text-primary">87</span>
+                        </div>
+                        <div className="w-full bg-muted/30 rounded-full h-1">
+                          <div className="bg-primary h-1 rounded-full" style={{ width: '87%' }}></div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {feature.title === "Sentiment Tracking" && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-foreground">Positive</span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-16 bg-muted rounded-full h-2">
+                              <div className="bg-green-500 h-2 rounded-full" style={{ width: '40%' }}></div>
+                            </div>
+                            <span className="text-xs font-bold text-green-500">40/100</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-foreground">Neutral</span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-16 bg-muted rounded-full h-2">
+                              <div className="bg-blue-500 h-2 rounded-full" style={{ width: '30%' }}></div>
+                            </div>
+                            <span className="text-xs font-bold text-blue-500">30/100</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-foreground">Negative</span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-16 bg-muted rounded-full h-2">
+                              <div className="bg-red-500 h-2 rounded-full" style={{ width: '20%' }}></div>
+                            </div>
+                            <span className="text-xs font-bold text-red-500">20/100</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {feature.title === "Keyword Intelligence" && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">Top Keywords</span>
+                          <span className="text-xs font-bold text-primary">92% Visibility</span>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-foreground">Pegasus</span>
+                            <div className="flex items-center gap-1">
+                              <TrendingUp className="w-3 h-3 text-green-500" />
+                              <span className="text-xs text-green-500">92%</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-foreground">Jordan</span>
+                            <div className="flex items-center gap-1">
+                              <Minus className="w-3 h-3 text-yellow-500" />
+                              <span className="text-xs text-yellow-500">86%</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-foreground">Air Max</span>
+                            <div className="flex items-center gap-1">
+                              <TrendingUp className="w-3 h-3 text-green-500" />
+                              <span className="text-xs text-green-500">85%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {feature.title === "Brand Identity Mapping" && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">Visibility</span>
+                          <span className="text-xs font-bold text-foreground">86</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">Distinctiveness</span>
+                          <span className="text-xs font-bold text-foreground">84</span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {feature.title === "Real-Time Updates" && (
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                        <span className="text-xs text-muted-foreground">Live Analysis</span>
+                      </div>
+                    )}
+                    
+                    {feature.title === "Multi-Market Support" && (
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-primary"></div>
+                        <span className="text-xs text-muted-foreground">Global Markets</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="w-full h-1 bg-gradient-to-r from-primary/20 to-primary/60 rounded-full"></div>
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Use Cases Section */}
-      <section className="py-20 px-6 border-t border-border/50">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
-          >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-primary tracking-tight" style={{ fontSize: '12px', fontWeight: 500 }}>AI-Native Analytics</span>
-            </div>
-            
-            <h2 className="text-foreground mb-4 tracking-tight" style={{ fontSize: '36px', fontWeight: 600 }}>
-              Built for modern brand teams
-            </h2>
-            <p className="text-muted-foreground mb-8 max-w-2xl mx-auto" style={{ fontSize: '16px', lineHeight: '1.6' }}>
-              As AI becomes the primary way people discover and research brands, 
-              understanding your AI visibility is critical. Brand Sense gives you the 
-              insights you need to stay ahead in an AI-first world.
-            </p>
-          </motion.div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
-            {useCases.map((useCase, index) => (
-              <motion.div
-                key={useCase}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.05 }}
-                className="flex items-start gap-3 p-4 rounded-lg bg-card/50 border border-border/50 hover:border-primary/30 transition-colors"
-              >
-                <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                <span className="text-foreground tracking-tight" style={{ fontSize: '14px', lineHeight: '1.5' }}>
-                  {useCase}
-                </span>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Brand Examples Section */}
       <section id="examples" className="py-20 px-6 border-t border-border/50 bg-card/30">
@@ -442,7 +410,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
             </p>
           </motion.div>
 
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {brandExamples.map((brand, index) => (
               <motion.div
                 key={brand.name}
@@ -450,50 +418,141 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="p-6 rounded-lg bg-card border border-border hover:border-primary/30 transition-all duration-300"
+                className="group p-6 rounded-xl bg-card border border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-pointer"
               >
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  <div className="lg:col-span-3">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-                        <brand.icon className="w-5 h-5 text-primary" />
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
+                    <brand.icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-foreground tracking-tight group-hover:text-primary transition-colors duration-300" style={{ fontSize: '20px', fontWeight: 600 }}>
+                      {brand.name}
+                    </h3>
+                    <p className="text-muted-foreground" style={{ fontSize: '14px' }}>
+                      {brand.market}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-muted-foreground mb-2 text-xs font-semibold uppercase tracking-wider">
+                      Challenge
+                    </p>
+                    <p className="text-foreground text-sm leading-relaxed">
+                      {brand.challenge}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-muted-foreground mb-2 text-xs font-semibold uppercase tracking-wider">
+                      Key Insight
+                    </p>
+                    <p className="text-foreground text-sm leading-relaxed">
+                      {brand.insight}
+                    </p>
+                  </div>
+                  
+                  {/* Mini Dashboard Preview */}
+                  <div className="mt-4 p-3 bg-card/30 rounded-lg border border-border/30">
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-foreground">
+                          {brand.name === 'Nike' ? '86' : brand.name === 'Starbucks' ? '82' : '89'}
+                        </div>
+                        <div className="text-xs text-muted-foreground">BPM Score</div>
                       </div>
-                      <div>
-                        <h3 className="text-foreground tracking-tight" style={{ fontSize: '18px', fontWeight: 600 }}>
-                          {brand.name}
-                        </h3>
-                        <p className="text-muted-foreground" style={{ fontSize: '13px' }}>
-                          {brand.market}
-                        </p>
+                      <div className="text-center">
+                    <div className="text-lg font-bold text-foreground">
+                      {brand.name === 'Nike' ? '40/100' : brand.name === 'Starbucks' ? '45/100' : '38/100'}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Positive</div>
                       </div>
+                    </div>
+                    <div className="space-y-2">
+                      {brand.name === 'Nike' && (
+                        <>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-foreground">Pegasus</span>
+                            <div className="flex items-center gap-1">
+                              <TrendingUp className="w-3 h-3 text-green-500" />
+                              <span className="text-xs text-green-500">92%</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-foreground">Jordan</span>
+                            <div className="flex items-center gap-1">
+                              <Minus className="w-3 h-3 text-yellow-500" />
+                              <span className="text-xs text-yellow-500">86%</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-foreground">Air Max</span>
+                            <div className="flex items-center gap-1">
+                              <TrendingUp className="w-3 h-3 text-green-500" />
+                              <span className="text-xs text-green-500">85%</span>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                      {brand.name === 'Starbucks' && (
+                        <>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-foreground">Coffee Culture</span>
+                            <div className="flex items-center gap-1">
+                              <TrendingUp className="w-3 h-3 text-green-500" />
+                              <span className="text-xs text-green-500">88%</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-foreground">Third Place</span>
+                            <div className="flex items-center gap-1">
+                              <TrendingUp className="w-3 h-3 text-green-500" />
+                              <span className="text-xs text-green-500">84%</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-foreground">Premium</span>
+                            <div className="flex items-center gap-1">
+                              <Minus className="w-3 h-3 text-yellow-500" />
+                              <span className="text-xs text-yellow-500">79%</span>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                      {brand.name === 'Tesla' && (
+                        <>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-foreground">Electric</span>
+                            <div className="flex items-center gap-1">
+                              <TrendingUp className="w-3 h-3 text-green-500" />
+                              <span className="text-xs text-green-500">91%</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-foreground">Innovation</span>
+                            <div className="flex items-center gap-1">
+                              <TrendingUp className="w-3 h-3 text-green-500" />
+                              <span className="text-xs text-green-500">89%</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-foreground">Autopilot</span>
+                            <div className="flex items-center gap-1">
+                              <TrendingDown className="w-3 h-3 text-red-500" />
+                              <span className="text-xs text-red-500">76%</span>
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                   
-                  <div className="lg:col-span-9 space-y-3">
-                    <div>
-                      <p className="text-muted-foreground mb-1" style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        Challenge
-                      </p>
-                      <p className="text-foreground" style={{ fontSize: '14px', lineHeight: '1.6' }}>
-                        {brand.challenge}
-                      </p>
-                    </div>
-                    
-                    <div>
-                      <p className="text-muted-foreground mb-1" style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        Key Insight
-                      </p>
-                      <p className="text-foreground" style={{ fontSize: '14px', lineHeight: '1.6' }}>
-                        {brand.insight}
-                      </p>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 pt-2">
-                      <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-                        <span className="text-primary tracking-tight" style={{ fontSize: '13px', fontWeight: 600 }}>
-                          {brand.metric}
-                        </span>
-                      </div>
+                  <div className="flex items-center justify-center pt-4 border-t border-border/50">
+                    <div className="px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+                      <span className="text-primary font-semibold text-sm">
+                        {brand.metric}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -521,42 +580,54 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={testimonial.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="p-6 rounded-lg bg-card border border-border hover:border-primary/30 transition-all duration-300"
-              >
-                <Quote className="w-8 h-8 text-primary/30 mb-4" />
-                
-                <p className="text-foreground mb-6" style={{ fontSize: '14px', lineHeight: '1.7' }}>
-                  "{testimonial.content}"
-                </p>
-                
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-                    <span className="text-primary tracking-tight" style={{ fontSize: '13px', fontWeight: 600 }}>
-                      {testimonial.avatar}
-                    </span>
+          <div className="relative">
+            <div className="flex overflow-x-auto scrollbar-hide gap-6 pb-4">
+              {testimonials.map((testimonial, index) => (
+                <motion.div
+                  key={testimonial.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className="flex-shrink-0 w-80 p-6 rounded-xl bg-card border border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group"
+                >
+                  <Quote className="w-8 h-8 text-primary/30 mb-4 group-hover:text-primary/50 transition-colors duration-300" />
+                  
+                  <p className="text-foreground mb-6 text-sm leading-relaxed group-hover:text-foreground/90 transition-colors duration-300">
+                    "{testimonial.content}"
+                  </p>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
+                      <span className="text-primary font-semibold text-sm">
+                        {testimonial.avatar}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-foreground font-semibold text-sm group-hover:text-primary transition-colors duration-300">
+                        {testimonial.name}
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        {testimonial.role}
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        {testimonial.company}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-foreground tracking-tight" style={{ fontSize: '14px', fontWeight: 600 }}>
-                      {testimonial.name}
-                    </p>
-                    <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
-                      {testimonial.role}
-                    </p>
-                    <p className="text-muted-foreground" style={{ fontSize: '11px' }}>
-                      {testimonial.company}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
+            
+            {/* Scroll indicators */}
+            <div className="flex justify-center gap-2 mt-6">
+              {testimonials.map((_, index) => (
+                <div
+                  key={index}
+                  className="w-2 h-2 rounded-full bg-border hover:bg-primary/50 transition-colors duration-300 cursor-pointer"
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -637,17 +708,39 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
               <BrandLogo />
             </div>
             
-            <p className="text-muted-foreground tracking-tight" style={{ fontSize: '14px' }}>
-              Brand Sense © 2025 · Powered by ChatGPT
-            </p>
-            
-            <button 
-              onClick={() => setShowSupportDialog(true)}
-              className="text-muted-foreground hover:text-primary transition-colors" 
-              style={{ fontSize: '14px' }}
-            >
-              Support
-            </button>
+            <div className="flex items-center gap-6">
+              <button 
+                onClick={() => onNavigate('terms')}
+                className="text-muted-foreground hover:text-primary transition-colors" 
+                style={{ fontSize: '14px' }}
+              >
+                Terms of Service
+              </button>
+              
+              <button 
+                onClick={() => onNavigate('privacy')}
+                className="text-muted-foreground hover:text-primary transition-colors" 
+                style={{ fontSize: '14px' }}
+              >
+                Privacy Policy
+              </button>
+              
+              <button 
+                onClick={() => onNavigate('refund')}
+                className="text-muted-foreground hover:text-primary transition-colors" 
+                style={{ fontSize: '14px' }}
+              >
+                Refund Policy
+              </button>
+              
+              <button 
+                onClick={() => setShowSupportDialog(true)}
+                className="text-muted-foreground hover:text-primary transition-colors" 
+                style={{ fontSize: '14px' }}
+              >
+                Support
+              </button>
+            </div>
           </div>
         </div>
       </footer>

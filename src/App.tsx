@@ -18,6 +18,9 @@ const ResetPasswordFail = lazy(() => import("./components/ResetPasswordFail").th
 const SessionExpired = lazy(() => import("./components/SessionExpired").then(m => ({ default: m.SessionExpired })));
 const CreateProject = lazy(() => import("./components/CreateProject").then(m => ({ default: m.CreateProject })));
 const DashboardLayout = lazy(() => import("./components/DashboardLayout").then(m => ({ default: m.DashboardLayout })));
+const TermsOfService = lazy(() => import("./components/TermsOfService").then(m => ({ default: m.TermsOfService })));
+const PrivacyPolicy = lazy(() => import("./components/PrivacyPolicy").then(m => ({ default: m.PrivacyPolicy })));
+const RefundPolicy = lazy(() => import("./components/RefundPolicy").then(m => ({ default: m.RefundPolicy })));
 
 export default function App() {
   const [activeScreen, setActiveScreen] = useState<Screen>(SCREENS.LANDING);
@@ -73,6 +76,24 @@ export default function App() {
       
       if (path === '/session-expired') {
         setActiveScreen(SCREENS.SESSION_EXPIRED);
+        setIsValidating(false);
+        return;
+      }
+      
+      if (path === '/terms' || path === '/terms-of-service') {
+        setActiveScreen(SCREENS.TERMS_OF_SERVICE);
+        setIsValidating(false);
+        return;
+      }
+      
+      if (path === '/privacy' || path === '/privacy-policy') {
+        setActiveScreen(SCREENS.PRIVACY_POLICY);
+        setIsValidating(false);
+        return;
+      }
+      
+      if (path === '/refund' || path === '/refund-policy') {
+        setActiveScreen(SCREENS.REFUND_POLICY);
         setIsValidating(false);
         return;
       }
@@ -149,12 +170,15 @@ export default function App() {
     [SCREENS.SESSION_EXPIRED]: SessionExpired,
     [SCREENS.CREATE_PROJECT]: CreateProject,
     [SCREENS.DASHBOARD]: DashboardLayout,
+    [SCREENS.TERMS_OF_SERVICE]: TermsOfService,
+    [SCREENS.PRIVACY_POLICY]: PrivacyPolicy,
+    [SCREENS.REFUND_POLICY]: RefundPolicy,
   };
 
   const ActiveComponent = SCREEN_COMPONENTS[activeScreen] || LandingPage;
 
-  // Landing page and Dashboard layout use full screen without default header/footer
-  if (activeScreen === SCREENS.LANDING || activeScreen === SCREENS.DASHBOARD) {
+  // Landing page, Dashboard layout, Terms of Service, Privacy Policy, and Refund Policy use full screen without default header/footer
+  if (activeScreen === SCREENS.LANDING || activeScreen === SCREENS.DASHBOARD || activeScreen === SCREENS.TERMS_OF_SERVICE || activeScreen === SCREENS.PRIVACY_POLICY || activeScreen === SCREENS.REFUND_POLICY) {
     return (
       <ErrorBoundary>
         <Toaster />

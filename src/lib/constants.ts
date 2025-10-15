@@ -19,6 +19,9 @@ export const SCREENS = {
   SESSION_EXPIRED: 'session-expired',
   CREATE_PROJECT: 'create-project',
   DASHBOARD: 'dashboard',
+  TERMS_OF_SERVICE: 'terms',
+  PRIVACY_POLICY: 'privacy',
+  REFUND_POLICY: 'refund',
 } as const;
 
 export type Screen = typeof SCREENS[keyof typeof SCREENS];
