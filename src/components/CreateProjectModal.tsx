@@ -57,6 +57,9 @@ const LANGUAGES = [
 ];
 
 export function CreateProjectModal({ isOpen, onClose, onProjectCreated, onNavigate }: CreateProjectModalProps) {
+  console.log('🔧 CreateProjectModal render - isOpen:', isOpen);
+  console.log('🔧 CreateProjectModal - Component is rendering!');
+  
   const [brandName, setBrandName] = useState("");
   const [market, setMarket] = useState("United States");
   const [language, setLanguage] = useState("English");
@@ -218,6 +221,8 @@ export function CreateProjectModal({ isOpen, onClose, onProjectCreated, onNaviga
     }
   };
 
+  console.log('🔧 CreateProjectModal - Rendering with isOpen:', isOpen);
+  
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">

@@ -384,6 +384,7 @@ export const storage = {
   getAllProjects: loadProjects,
   getProject: loadProject,
   saveProject,
+  saveProjects,
   deleteProject,
   updateProjectStatus,
   updateProjectData,

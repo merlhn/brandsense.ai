@@ -144,12 +144,24 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     const accessToken = storage.getAccessToken();
     
     if (!accessToken) {
+      console.log('🚨 No access token found, redirecting to sign in');
       logger.security('No access token found in DashboardLayout, redirecting to sign in');
       toast.error('Session Expired', {
         description: 'Please sign in again to continue.'
       });
       onNavigate?.(SCREENS.SIGN_IN);
+      return;
     }
+    
+    // Validate token format
+    if (typeof accessToken !== 'string' || accessToken.length < 10) {
+      console.log('🚨 Invalid access token format, redirecting to sign in');
+      storage.clearAll();
+      onNavigate?.(SCREENS.SIGN_IN);
+      return;
+    }
+    
+    console.log('✅ Access token found and valid');
   }, [onNavigate]);
 
   // Email değişikliklerini dinle
@@ -225,7 +237,20 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     const syncProjectsFromBackend = async () => {
       const accessToken = storage.getAccessToken();
       if (!accessToken) {
+        console.log('🚨 No access token during project sync, redirecting to sign in');
         logger.warning('No access token during project sync');
+        toast.error('Session Expired', {
+          description: 'Please sign in again to continue.'
+        });
+        onNavigate?.(SCREENS.SIGN_IN);
+        return;
+      }
+      
+      // Validate token format
+      if (typeof accessToken !== 'string' || accessToken.length < 10) {
+        console.log('🚨 Invalid access token format during project sync');
+        storage.clearAll();
+        onNavigate?.(SCREENS.SIGN_IN);
         return;
       }
 
@@ -307,7 +332,19 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       try {
         const accessToken = storage.getAccessToken();
         if (!accessToken) {
+          console.log('🚨 No access token during project data fetch, redirecting to sign in');
           logger.warning('No access token during project data fetch');
+          toast.error('Session Expired', {
+            description: 'Please sign in again to continue.'
+          });
+          onNavigate?.(SCREENS.SIGN_IN);
+          return;
+        }
+        
+        // Validate token format
+        if (typeof accessToken !== 'string' || accessToken.length < 10) {
+          console.log('🚨 Invalid access token format during project data fetch');
+          storage.clearAll();
           onNavigate?.(SCREENS.SIGN_IN);
           return;
         }
@@ -451,9 +488,18 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       
       const accessToken = storage.getAccessToken();
       if (!accessToken) {
+        console.log('🚨 No access token during refresh, redirecting to sign in');
         toast.error('Session Expired', {
           description: 'Please sign in again to continue.'
         });
+        onNavigate?.(SCREENS.SIGN_IN);
+        return;
+      }
+      
+      // Validate token format
+      if (typeof accessToken !== 'string' || accessToken.length < 10) {
+        console.log('🚨 Invalid access token format during refresh');
+        storage.clearAll();
         onNavigate?.(SCREENS.SIGN_IN);
         return;
       }
@@ -552,9 +598,18 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     try {
       const accessToken = storage.getAccessToken();
       if (!accessToken) {
+        console.log('🚨 No access token during data recovery, redirecting to sign in');
         toast.error('Session Expired', {
           description: 'Please sign in again to recover data.'
         });
+        onNavigate?.(SCREENS.SIGN_IN);
+        return;
+      }
+      
+      // Validate token format
+      if (typeof accessToken !== 'string' || accessToken.length < 10) {
+        console.log('🚨 Invalid access token format during data recovery');
+        storage.clearAll();
         onNavigate?.(SCREENS.SIGN_IN);
         return;
       }
@@ -684,6 +739,9 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
   };
 
   const switchToProject = (project: Project) => {
+    console.log('🔧 switchToProject called for:', project.name);
+    console.log('🔧 projects.length:', projects.length);
+    
     // Update selected project
     setSelectedProject(project);
     storage.setCurrentProject(project);
@@ -694,15 +752,24 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     // Fetch project data
     loadProjectData(project.id);
     
-    // Success feedback
-    toast.success(`Switched to ${project.name}`);
+    // DISABLED: No toast for project switching
+    console.log('🔧 Toast disabled for project switching');
   };
 
   const loadProjectData = async (projectId: string) => {
     try {
       const accessToken = storage.getAccessToken();
       if (!accessToken) {
+        console.log('🚨 No access token during load project data, redirecting to sign in');
         toast.error('Session expired. Please sign in again.');
+        onNavigate?.(SCREENS.SIGN_IN);
+        return;
+      }
+      
+      // Validate token format
+      if (typeof accessToken !== 'string' || accessToken.length < 10) {
+        console.log('🚨 Invalid access token format during load project data');
+        storage.clearAll();
         onNavigate?.(SCREENS.SIGN_IN);
         return;
       }
@@ -732,36 +799,50 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
   };
 
 
-  // Debug logs for troubleshooting
-  console.log('🔍 DashboardLayout - selectedProject:', selectedProject ? 'Present' : 'Missing');
-  console.log('🔍 DashboardLayout - selectedProject ID:', selectedProject?.id);
-  console.log('🔍 DashboardLayout - activeItem:', activeItem);
-  console.log('🔍 DashboardLayout - URL path:', window.location.pathname);
 
   // Handle case when no project is selected
   if (!selectedProject) {
-    console.log('❌ DashboardLayout - No project selected, showing fallback');
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-6">
-            <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-            </svg>
+      <div className="h-screen bg-background flex">
+        <Sidebar
+          activeItem={activeItem}
+          setActiveItem={handleSetActiveItem}
+          hoveredItem={hoveredItem}
+          setHoveredItem={setHoveredItem}
+          userEmail={userEmail}
+          onLogout={() => setShowLogoutDialog(true)}
+          projects={projects}
+          selectedProject={selectedProject}
+          onProjectSelect={switchToProject}
+          onCreateProject={handleCreateProject}
+        />
+
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-foreground mb-4">No Project</h2>
+            <p className="text-muted-foreground mb-6">
+              Please create a project to monitor your brand.
+            </p>
+            <button
+              onClick={() => {
+                console.log('🔧 Main Create Project button clicked');
+                handleCreateProject();
+              }}
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              Create New Project
+            </button>
           </div>
-          <h3 className="text-foreground tracking-tight mb-2 text-[18px] font-medium">
-            No Project Selected
-          </h3>
-          <p className="text-muted-foreground tracking-tight text-[15px] mb-6">
-            Please select a project to view the dashboard.
-          </p>
-          <button
-            onClick={handleCreateProject}
-            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
-            Create Project
-          </button>
         </div>
+
+
+        {/* Create Project Modal - NO PROJECT CASE */}
+        <CreateProjectModal
+          isOpen={showCreateProject}
+          onClose={() => setShowCreateProject(false)}
+          onProjectCreated={handleProjectCreated}
+          onNavigate={onNavigate}
+        />
       </div>
     );
   }
@@ -817,6 +898,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
         onProjectCreated={handleProjectCreated}
         onNavigate={onNavigate}
       />
+
 
       {/* Data Corruption Recovery Dialog */}
       <AlertDialog open={showDataCorruptionDialog} onOpenChange={setShowDataCorruptionDialog}>

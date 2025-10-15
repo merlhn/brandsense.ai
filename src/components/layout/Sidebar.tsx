@@ -166,8 +166,8 @@ export function Sidebar({
             
             {/* Empty State */}
             {projects.length === 0 && (
-              <div className="p-2 rounded-lg bg-muted/50 border border-border">
-                <p className="text-muted-foreground tracking-tight text-[11px]">
+              <div className="text-center py-4">
+                <p className="text-[10px] text-muted-foreground mb-3">
                   No projects yet
                 </p>
               </div>

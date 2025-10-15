@@ -176,12 +176,12 @@ export function ProjectSettings({ onNavigate, onDeleteProject, onProjectUpdated,
       
       // 6. Show success message
       toast.success('Project Deleted', {
-        description: `"${selectedProject.name}" has been permanently deleted.`
+        description: `"${selectedProject.name}" has been permanently deleted.`,
       });
       
       console.log('✅ Hard delete complete');
       
-      // 7. Call parent handler which will reload projects and navigate
+      // 8. Call parent handler which will reload projects and navigate
       setIsDeleting(false);
       onDeleteProject?.();
       
@@ -190,7 +190,8 @@ export function ProjectSettings({ onNavigate, onDeleteProject, onProjectUpdated,
       setIsDeleting(false);
       
       toast.error('Delete Failed', {
-        description: error.message || 'Could not delete project. Please try again.'
+        description: error.message || 'Could not delete project. Please try again.',
+        duration: 5000,
       });
       
       // Don't close dialog on error - user can retry
