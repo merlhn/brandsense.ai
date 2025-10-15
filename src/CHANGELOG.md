@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.2] - "Domain Update & UI Improvements" - 2025-01-08
+
+### 🌐 Domain Updates
+
+#### Website Domain Migration
+- **Updated:** All policy pages now reference `brandsense.digital`
+- **Privacy Policy:** Website URL updated to `https://brandsense.digital`
+- **Terms of Service:** Website URL updated to `https://brandsense.digital`
+- **Jurisdiction:** Terms of Service jurisdiction set to Turkey
+- **Result:** Consistent branding across all legal documents
+
+### 🎨 UI/UX Improvements
+
+#### Landing Page Cleanup
+- **Removed:** "Built for modern brand teams" section
+- **Removed:** Animated arrows from brand examples cards
+- **Result:** Cleaner, more focused landing page
+
+#### Brand Examples Cards
+- **Removed:** Hover animations and clickable arrows
+- **Simplified:** Static BPM score display only
+- **Result:** Less distracting, more professional appearance
+
+### 🔧 Technical Changes
+- Updated `src/components/PrivacyPolicy.tsx`
+- Updated `src/components/TermsOfService.tsx`
+- Modified `src/components/LandingPage.tsx`
+- All changes tested and linted
+
+### ✅ Quality Assurance
+- All policy pages reviewed and updated
+- Domain consistency verified across all pages
+- UI improvements tested on multiple screen sizes
+- No breaking changes to existing functionality
+
+---
 
 ## [1.0.1] - "Create Project Modal Fix" - 2025-01-08
 

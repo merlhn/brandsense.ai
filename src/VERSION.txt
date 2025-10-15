@@ -1,3 +1,3 @@
-1.0.1
-Enhanced UX
+1.0.2
+Domain Update & UI Improvements
 2025-01-08
