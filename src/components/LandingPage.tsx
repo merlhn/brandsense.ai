@@ -186,12 +186,6 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
             className="max-w-4xl mx-auto text-center"
           >
             <div className="space-y-6">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 w-fit">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                  <span className="text-primary tracking-tight" style={{ fontSize: '13px', fontWeight: 500 }}>Powered by GPT-4o</span>
-                </div>
-              </div>
               
               <h1 className="text-foreground tracking-tight" style={{ fontSize: '56px', lineHeight: '1.1', fontWeight: 600 }}>
                 Monitor Your Brand Visibility
