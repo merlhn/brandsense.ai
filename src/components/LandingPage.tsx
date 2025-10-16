@@ -139,6 +139,14 @@ const testimonials = [
 
 export function LandingPage({ onNavigate }: LandingPageProps) {
   const [showSupportDialog, setShowSupportDialog] = useState(false);
+  const [isAnnual, setIsAnnual] = useState(false);
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <div 
@@ -150,34 +158,64 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <BrandLogo />
           
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              onClick={() => setShowSupportDialog(true)}
-              className="text-foreground hover:text-primary hover:bg-transparent"
-            >
-              <Mail className="w-4 h-4 mr-2" />
-              Support
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => onNavigate("signin")}
-              className="border-border text-foreground hover:bg-secondary"
-            >
-              Sign In
-            </Button>
-            <Button
-              onClick={() => onNavigate("signup")}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2"
-            >
-              Get Started
-            </Button>
+          <div className="flex items-center gap-6">
+            {/* Navigation Menu */}
+            <nav className="hidden md:flex items-center space-x-6">
+              <button 
+                onClick={() => scrollToSection('hero')}
+                className="text-foreground hover:text-primary transition-colors"
+              >
+                Home
+              </button>
+              <button 
+                onClick={() => scrollToSection('features')}
+                className="text-foreground hover:text-primary transition-colors"
+              >
+                Features
+              </button>
+              <button 
+                onClick={() => scrollToSection('pricing')}
+                className="text-foreground hover:text-primary transition-colors"
+              >
+                Pricing
+              </button>
+              <button 
+                onClick={() => scrollToSection('faq')}
+                className="text-foreground hover:text-primary transition-colors"
+              >
+                FAQ
+              </button>
+            </nav>
+
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                onClick={() => setShowSupportDialog(true)}
+                className="text-foreground hover:text-primary hover:bg-transparent"
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Support
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => onNavigate("signin")}
+                className="border-border text-foreground hover:bg-secondary"
+              >
+                Sign In
+              </Button>
+              <Button
+                onClick={() => onNavigate("signup")}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2"
+              >
+                Get Started
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6">
+      <section id="hero" className="pt-32 pb-20 px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -235,7 +273,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
 
 
       {/* Features Grid */}
-      <section className="py-20 px-6 border-t border-border/50">
+      <section id="features" className="py-20 px-6 border-t border-border/50">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -667,36 +705,344 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 border-t border-border/30">
-              <div className="text-center">
-                <CheckCircle2 className="w-5 h-5 text-primary mx-auto mb-2" />
-                <p className="text-foreground tracking-tight" style={{ fontSize: '14px', fontWeight: 500 }}>
-                  No credit card required
-                </p>
-                <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
-                  Start analyzing immediately
-                </p>
-              </div>
-              <div className="text-center">
-                <CheckCircle2 className="w-5 h-5 text-primary mx-auto mb-2" />
-                <p className="text-foreground tracking-tight" style={{ fontSize: '14px', fontWeight: 500 }}>
-                  2-3 minute analysis
-                </p>
-                <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
-                  Get instant insights
-                </p>
-              </div>
-              <div className="text-center">
-                <CheckCircle2 className="w-5 h-5 text-primary mx-auto mb-2" />
-                <p className="text-foreground tracking-tight" style={{ fontSize: '14px', fontWeight: 500 }}>
-                  Unlimited refreshes
-                </p>
-                <p className="text-muted-foreground" style={{ fontSize: '12px' }}>
-                  Stay always current
-                </p>
-              </div>
-            </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="py-20 px-6 bg-card/30">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            
+            <h2 className="text-4xl font-bold text-foreground mb-4">
+              Choose Your Plan
+            </h2>
+            
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Start monitoring your brand's AI visibility today. 
+              No hidden fees, no long-term contracts.
+            </p>
+          </motion.div>
+
+          {/* Pricing Toggle */}
+          <div className="flex items-center justify-center mb-12">
+            <div className="flex items-center bg-card rounded-lg p-1 border border-border">
+              <button
+                onClick={() => setIsAnnual(false)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  !isAnnual 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setIsAnnual(true)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isAnnual 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Annual
+                <span className="ml-1 px-2 py-0.5 bg-primary/20 text-primary text-xs rounded-full">
+                  Save 17%
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Starter Plan */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="p-8 rounded-2xl bg-card border-2 border-border hover:border-primary/20 transition-colors"
+            >
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-foreground mb-2">Starter</h3>
+                <div className="mb-4">
+                  <span className="text-4xl font-bold text-foreground">Free</span>
+                </div>
+                <p className="text-muted-foreground">Perfect for individuals and small businesses</p>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                {[
+                  "Single Brand Monitoring",
+                  "Limited data refresh",
+                  "Single Market Analysis for Brand"
+                ].map((feature, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                    <span className="text-foreground text-sm">{feature}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Dashboards Section */}
+              <div className="border-t border-border/30 pt-4 mb-6">
+                <h4 className="text-sm font-medium text-foreground mb-3">Dashboards</h4>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                    <span className="text-foreground text-sm">Keyword Analysis</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Settings & Support Section */}
+              <div className="border-t border-border/30 pt-4 mb-6">
+                <h4 className="text-sm font-medium text-foreground mb-3">Settings & Support</h4>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                    <span className="text-foreground text-sm">Email Support in 48h</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                    <span className="text-foreground text-sm">1 seat in workspace</span>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                className="w-full bg-secondary hover:bg-secondary/80 text-secondary-foreground"
+                onClick={() => onNavigate('signup')}
+              >
+                Get Started Free
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </motion.div>
+
+            {/* Professional Plan */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="relative p-8 rounded-2xl bg-card border-2 border-primary ring-2 ring-primary/20 shadow-lg shadow-primary/5"
+            >
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <div className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
+                  Most Popular
+                </div>
+              </div>
+
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-foreground mb-2">Professional</h3>
+                <div className="mb-4">
+                  <span className="text-4xl font-bold text-foreground">{isAnnual ? "$100" : "$9.99"}</span>
+                  <span className="text-muted-foreground ml-1">{isAnnual ? "/year" : "/month"}</span>
+                </div>
+                <p className="text-muted-foreground">For growing businesses and marketing teams</p>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                {[
+                  "Multi Brand Monitoring up to 10",
+                  "Unlimited Data refresh",
+                  "Multi Market Analysis for Brand"
+                ].map((feature, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                    <span className="text-foreground text-sm">{feature}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Dashboards Section */}
+              <div className="border-t border-border/30 pt-4 mb-6">
+                <h4 className="text-sm font-medium text-foreground mb-3">Dashboards</h4>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                    <span className="text-foreground text-sm">Keyword Analysis</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                    <span className="text-foreground text-sm">Sentiment Analysis</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                    <span className="text-foreground text-sm">Brand Identity</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Settings & Support Section */}
+              <div className="border-t border-border/30 pt-4 mb-6">
+                <h4 className="text-sm font-medium text-foreground mb-3">Settings & Support</h4>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                    <span className="text-foreground text-sm">Priority Support (24h)</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                    <span className="text-foreground text-sm">2 seats in workspace</span>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                onClick={() => onNavigate('signup')}
+              >
+                Start Free Trial
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section id="faq" className="py-20 px-6 bg-background">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl font-bold text-foreground mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Everything you need to know about Brand Sense pricing and features.
+            </p>
+          </motion.div>
+          
+          <div className="space-y-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="bg-card rounded-lg p-6 border border-border/50"
+            >
+              <h3 className="text-lg font-semibold text-foreground mb-3">
+                What's the difference between Starter and Professional plans?
+              </h3>
+              <p className="text-muted-foreground">
+                Starter is perfect for individuals and small businesses with single brand monitoring, 
+                limited data refresh, and basic keyword analysis. Professional offers multi-brand monitoring 
+                (up to 10 brands), unlimited data refresh, sentiment analysis, brand identity insights, 
+                and priority support.
+              </p>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="bg-card rounded-lg p-6 border border-border/50"
+            >
+              <h3 className="text-lg font-semibold text-foreground mb-3">
+                Can I change plans anytime?
+              </h3>
+              <p className="text-muted-foreground">
+                Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately, 
+                and you'll only pay the prorated difference for upgrades or receive credits for downgrades.
+              </p>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              viewport={{ once: true }}
+              className="bg-card rounded-lg p-6 border border-border/50"
+            >
+              <h3 className="text-lg font-semibold text-foreground mb-3">
+                What happens to my data if I cancel?
+              </h3>
+              <p className="text-muted-foreground">
+                Your data is safely stored for 30 days after cancellation. You can reactivate your account 
+                anytime during this period to restore all your brand monitoring data and insights.
+              </p>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
+              className="bg-card rounded-lg p-6 border border-border/50"
+            >
+              <h3 className="text-lg font-semibold text-foreground mb-3">
+                Is there a free trial for Professional?
+              </h3>
+              <p className="text-muted-foreground">
+                Yes! Start with our free Starter plan and upgrade to Professional when you're ready. 
+                You can also contact our sales team for a personalized demo of Professional features.
+              </p>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              viewport={{ once: true }}
+              className="bg-card rounded-lg p-6 border border-border/50"
+            >
+              <h3 className="text-lg font-semibold text-foreground mb-3">
+                How does the workspace feature work?
+              </h3>
+              <p className="text-muted-foreground">
+                Starter includes 1 seat in your workspace, while Professional includes 2 seats. 
+                You can invite team members to collaborate on brand monitoring and share insights 
+                across your organization.
+              </p>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              viewport={{ once: true }}
+              className="bg-card rounded-lg p-6 border border-border/50"
+            >
+              <h3 className="text-lg font-semibold text-foreground mb-3">
+                What does "Limited data refresh" mean?
+              </h3>
+              <p className="text-muted-foreground">
+                Starter plan includes basic data refresh capabilities, while Professional offers 
+                unlimited data refresh to ensure you always have the most current brand insights 
+                and AI conversation data.
+              </p>
+            </motion.div>
+            
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              viewport={{ once: true }}
+              className="bg-card rounded-lg p-6 border border-border/50"
+            >
+              <h3 className="text-lg font-semibold text-foreground mb-3">
+                How does the annual pricing work?
+              </h3>
+              <p className="text-muted-foreground">
+                Annual billing saves you 17% compared to monthly billing. You'll be charged 
+                $100/year instead of $9.99/month, and you can switch between monthly and annual 
+                billing at any time.
+              </p>
+            </motion.div>
+          </div>
         </div>
       </section>
 

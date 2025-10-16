@@ -109,7 +109,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
   const [showDataCorruptionDialog, setShowDataCorruptionDialog] = useState(false);
   const [userEmail, setUserEmail] = useState(() => {
     const email = storage.getUserEmail();
-    console.log('🔍 DashboardLayout - Initial userEmail:', email);
+    logger.info('DashboardLayout initialized', { userEmail: email });
     return email || '';
   });
   const [showOnboardingBanner, setShowOnboardingBanner] = useState(() => {
@@ -144,7 +144,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     const accessToken = storage.getAccessToken();
     
     if (!accessToken) {
-      console.log('🚨 No access token found, redirecting to sign in');
+      logger.error('No access token found, redirecting to sign in');
       logger.security('No access token found in DashboardLayout, redirecting to sign in');
       toast.error('Session Expired', {
         description: 'Please sign in again to continue.'
@@ -155,25 +155,25 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     
     // Validate token format
     if (typeof accessToken !== 'string' || accessToken.length < 10) {
-      console.log('🚨 Invalid access token format, redirecting to sign in');
+      logger.error('Invalid access token format, redirecting to sign in');
       storage.clearAll();
       onNavigate?.(SCREENS.SIGN_IN);
       return;
     }
     
-    console.log('✅ Access token found and valid');
+    logger.info('Access token found and valid');
   }, [onNavigate]);
 
   // Email değişikliklerini dinle
   useEffect(() => {
     const handleStorageChange = () => {
       const email = storage.getUserEmail();
-      console.log('🔄 Storage change detected - userEmail:', email);
+      logger.info('Storage change detected', { userEmail: email });
       if (email) {
         setUserEmail(email);
-        console.log('✅ UserEmail updated to:', email);
+        logger.info('UserEmail updated', { email });
       } else {
-        console.log('⚠️ No email found in storage');
+        logger.warning('No email found in storage');
       }
     };
 
@@ -194,9 +194,10 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       const allProjects = storage.getAllProjects();
       const currentProject = storage.getCurrentProject();
       
-      console.log('🔄 Projects updated in storage, refreshing dashboard...');
-      console.log(`   Total projects: ${allProjects.length}`);
-      console.log(`   Current project: ${currentProject?.name || 'None'}`);
+      logger.info('Projects updated in storage, refreshing dashboard', { 
+        totalProjects: allProjects.length,
+        currentProject: currentProject?.name || 'None'
+      });
       
       // Update projects state
       setProjects(allProjects);
@@ -221,7 +222,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
   // Listen for data recovery trigger from child components
   useEffect(() => {
     const handleDataRecoveryTrigger = () => {
-      console.log('📡 Data recovery triggered from child component');
+      logger.info('Data recovery triggered from child component');
       setShowDataCorruptionDialog(true);
     };
     
@@ -237,7 +238,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     const syncProjectsFromBackend = async () => {
       const accessToken = storage.getAccessToken();
       if (!accessToken) {
-        console.log('🚨 No access token during project sync, redirecting to sign in');
+        logger.error('No access token during project sync, redirecting to sign in');
         logger.warning('No access token during project sync');
         toast.error('Session Expired', {
           description: 'Please sign in again to continue.'
@@ -248,13 +249,13 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       
       // Validate token format
       if (typeof accessToken !== 'string' || accessToken.length < 10) {
-        console.log('🚨 Invalid access token format during project sync');
+        logger.error('Invalid access token format during project sync');
         storage.clearAll();
         onNavigate?.(SCREENS.SIGN_IN);
         return;
       }
 
-      console.log('🔄 Syncing projects from backend...');
+      logger.info('Syncing projects from backend');
       
       try {
         const response = await fetch(
@@ -270,7 +271,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
           const data = await response.json();
           const backendProjects = data.projects || [];
           
-          console.log(`✅ Backend has ${backendProjects.length} projects`);
+          logger.info('Backend projects synced', { count: backendProjects.length });
           
           // Update local storage with backend projects
           storage.saveProjects(backendProjects);
@@ -285,10 +286,10 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
           }
           
         } else {
-          console.log('⚠️ Could not sync projects with backend');
+          logger.warning('Could not sync projects with backend');
         }
       } catch (error) {
-        console.log('⚠️ Error syncing projects:', error);
+        logger.error('Error syncing projects', { error });
       }
     };
 
@@ -332,7 +333,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       try {
         const accessToken = storage.getAccessToken();
         if (!accessToken) {
-          console.log('🚨 No access token during project data fetch, redirecting to sign in');
+          logger.error('No access token during project data fetch, redirecting to sign in');
           logger.warning('No access token during project data fetch');
           toast.error('Session Expired', {
             description: 'Please sign in again to continue.'
@@ -343,13 +344,13 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
         
         // Validate token format
         if (typeof accessToken !== 'string' || accessToken.length < 10) {
-          console.log('🚨 Invalid access token format during project data fetch');
+          logger.error('Invalid access token format during project data fetch');
           storage.clearAll();
           onNavigate?.(SCREENS.SIGN_IN);
           return;
         }
         
-        console.log(`📡 Fetching project data for: ${selectedProject.id}`);
+        logger.info('Fetching project data', { projectId: selectedProject.id });
         
         const response = await fetch(
           `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROJECTS.GET(selectedProject.id)}`,
@@ -366,7 +367,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
           
           // Check if it's a 404 (project not found)
           if (response.status === 404) {
-            console.log('🗑️ Project not found in backend, removing from local storage');
+            logger.warning('Project not found in backend, removing from local storage');
             storage.deleteProject(selectedProject.id);
             
             // Update projects state
@@ -454,16 +455,16 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     let pollInterval: NodeJS.Timeout | null = null;
     
     if (selectedProject.dataStatus === 'processing') {
-      console.log('🔄 Setting up polling for processing project...');
+      logger.info('Setting up polling for processing project');
       pollInterval = setInterval(() => {
-        console.log('🔄 Polling for project data...');
+        logger.info('Polling for project data');
         fetchProjectData();
       }, 10000); // Poll every 10 seconds
     }
     
     return () => {
       if (pollInterval) {
-        console.log('⏹️ Stopping polling');
+        logger.info('Stopping polling');
         clearInterval(pollInterval);
       }
     };
@@ -488,7 +489,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       
       const accessToken = storage.getAccessToken();
       if (!accessToken) {
-        console.log('🚨 No access token during refresh, redirecting to sign in');
+        logger.error('No access token during refresh, redirecting to sign in');
         toast.error('Session Expired', {
           description: 'Please sign in again to continue.'
         });
@@ -498,7 +499,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       
       // Validate token format
       if (typeof accessToken !== 'string' || accessToken.length < 10) {
-        console.log('🚨 Invalid access token format during refresh');
+        logger.error('Invalid access token format during refresh');
         storage.clearAll();
         onNavigate?.(SCREENS.SIGN_IN);
         return;
@@ -593,12 +594,12 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
   };
 
   const handleDataRecovery = async () => {
-    console.log('🔧 Starting emergency data recovery...');
+      logger.info('Starting emergency data recovery');
     
     try {
       const accessToken = storage.getAccessToken();
       if (!accessToken) {
-        console.log('🚨 No access token during data recovery, redirecting to sign in');
+        logger.error('No access token during data recovery, redirecting to sign in');
         toast.error('Session Expired', {
           description: 'Please sign in again to recover data.'
         });
@@ -608,7 +609,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       
       // Validate token format
       if (typeof accessToken !== 'string' || accessToken.length < 10) {
-        console.log('🚨 Invalid access token format during data recovery');
+        logger.error('Invalid access token format during data recovery');
         storage.clearAll();
         onNavigate?.(SCREENS.SIGN_IN);
         return;
@@ -739,8 +740,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
   };
 
   const switchToProject = (project: Project) => {
-    console.log('🔧 switchToProject called for:', project.name);
-    console.log('🔧 projects.length:', projects.length);
+    logger.info('Switching to project', { projectName: project.name, totalProjects: projects.length });
     
     // Update selected project
     setSelectedProject(project);
@@ -753,14 +753,14 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
     loadProjectData(project.id);
     
     // DISABLED: No toast for project switching
-    console.log('🔧 Toast disabled for project switching');
+    logger.info('Toast disabled for project switching');
   };
 
   const loadProjectData = async (projectId: string) => {
     try {
       const accessToken = storage.getAccessToken();
       if (!accessToken) {
-        console.log('🚨 No access token during load project data, redirecting to sign in');
+        logger.error('No access token during load project data, redirecting to sign in');
         toast.error('Session expired. Please sign in again.');
         onNavigate?.(SCREENS.SIGN_IN);
         return;
@@ -768,7 +768,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
       
       // Validate token format
       if (typeof accessToken !== 'string' || accessToken.length < 10) {
-        console.log('🚨 Invalid access token format during load project data');
+        logger.error('Invalid access token format during load project data');
         storage.clearAll();
         onNavigate?.(SCREENS.SIGN_IN);
         return;
@@ -825,7 +825,7 @@ export function DashboardLayout({ onNavigate }: DashboardLayoutProps) {
             </p>
             <button
               onClick={() => {
-                console.log('🔧 Main Create Project button clicked');
+                logger.info('Main Create Project button clicked');
                 handleCreateProject();
               }}
               className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"

@@ -1,4 +1,5 @@
 import { Project } from "../../lib/types";
+import { logger } from "../../lib/logger";
 import { KeywordAnalysis } from "../KeywordAnalysis";
 import { BrandIdentity } from "../BrandIdentity";
 import { SentimentAnalysis } from "../SentimentAnalysis";
@@ -19,12 +20,14 @@ export function MainContent({
   onNavigate,
   onDeleteProject
 }: MainContentProps) {
-  console.log('🔍 MainContent - activeItem:', activeItem);
-  console.log('🔍 MainContent - selectedProject:', selectedProject ? 'Present' : 'Missing');
-  console.log('🔍 MainContent - selectedProject ID:', selectedProject?.id);
+  logger.info('MainContent render', { 
+    activeItem, 
+    hasProject: !!selectedProject,
+    projectId: selectedProject?.id
+  });
 
   const renderContent = () => {
-    console.log('🔍 MainContent - Rendering content for activeItem:', activeItem);
+    logger.info('Rendering content for activeItem', { activeItem });
     switch (activeItem) {
       case 'identity':
         return <BrandIdentity project={selectedProject} />;
@@ -37,7 +40,7 @@ export function MainContent({
       case 'account-settings':
         return <AccountSettings onNavigate={onNavigate} />;
       case 'project-settings':
-        console.log('🔍 MainContent - Rendering ProjectSettings');
+        logger.info('Rendering ProjectSettings');
         try {
           return (
             <ProjectSettings 
@@ -47,7 +50,7 @@ export function MainContent({
             />
           );
         } catch (error) {
-          console.error('❌ MainContent - Error rendering ProjectSettings:', error);
+          logger.error('Error rendering ProjectSettings', { error });
           return (
             <div className="min-h-screen bg-background flex items-center justify-center">
               <div className="text-center">

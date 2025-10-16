@@ -18,6 +18,7 @@ import {
 import { Project } from "../lib/types";
 import { storage } from "../lib/storage";
 import { API_CONFIG } from "../lib/api";
+import { logger } from "../lib/logger";
 import { toast } from "sonner@2.0.3";
 
 interface ProjectSettingsProps {
@@ -53,10 +54,11 @@ const languages = [
 ];
 
 export function ProjectSettings({ onNavigate, onDeleteProject, onProjectUpdated, selectedProject }: ProjectSettingsProps) {
-  console.log('🔍 ProjectSettings - Component mounted');
-  console.log('🔍 ProjectSettings - selectedProject:', selectedProject ? 'Present' : 'Missing');
-  console.log('🔍 ProjectSettings - selectedProject ID:', selectedProject?.id);
-  console.log('🔍 ProjectSettings - selectedProject name:', selectedProject?.name);
+  logger.info('ProjectSettings component mounted', { 
+    hasProject: !!selectedProject,
+    projectId: selectedProject?.id,
+    projectName: selectedProject?.name
+  });
   
   // Delete confirmation state
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
@@ -127,9 +129,10 @@ export function ProjectSettings({ onNavigate, onDeleteProject, onProjectUpdated,
         return;
       }
       
-      console.log('🗑️ Hard deleting project from backend...');
-      console.log('   Project ID:', selectedProject.id);
-      console.log('   Project Name:', selectedProject.name);
+      logger.info('Hard deleting project from backend', { 
+        projectId: selectedProject.id,
+        projectName: selectedProject.name
+      });
       
       const response = await fetch(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROJECTS.GET(selectedProject.id)}`,
@@ -143,11 +146,11 @@ export function ProjectSettings({ onNavigate, onDeleteProject, onProjectUpdated,
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('❌ Backend delete failed:', response.status, errorData);
+        logger.error('Backend delete failed', { status: response.status, error: errorData });
         
         // Handle 404 - project already deleted from backend
         if (response.status === 404) {
-          console.log('⚠️ Project already deleted from backend, cleaning localStorage...');
+          logger.warning('Project already deleted from backend, cleaning localStorage');
           toast.info('Project already deleted', {
             description: 'Removing from local storage...'
           });
@@ -155,16 +158,16 @@ export function ProjectSettings({ onNavigate, onDeleteProject, onProjectUpdated,
           throw new Error(errorData.error || errorData.message || 'Failed to delete project from backend');
         }
       } else {
-        console.log('✅ Project deleted from backend successfully');
+        logger.info('Project deleted from backend successfully');
       }
       
       // 2. Delete from localStorage
-      console.log('🧹 Removing project from localStorage...');
+      logger.info('Removing project from localStorage');
       storage.deleteProject(selectedProject.id);
       
       // 3. Get remaining projects
       const remainingProjects = storage.getAllProjects();
-      console.log(`   Remaining projects: ${remainingProjects.length}`);
+      logger.info('Remaining projects after deletion', { count: remainingProjects.length });
       
       // 4. If there are remaining projects, select the first one
       if (remainingProjects.length > 0) {
@@ -179,14 +182,14 @@ export function ProjectSettings({ onNavigate, onDeleteProject, onProjectUpdated,
         description: `"${selectedProject.name}" has been permanently deleted.`,
       });
       
-      console.log('✅ Hard delete complete');
+      logger.info('Hard delete complete');
       
       // 8. Call parent handler which will reload projects and navigate
       setIsDeleting(false);
       onDeleteProject?.();
       
     } catch (error: any) {
-      console.error('❌ Error during hard delete:', error);
+      logger.error('Error during hard delete', { error });
       setIsDeleting(false);
       
       toast.error('Delete Failed', {

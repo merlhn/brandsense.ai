@@ -92,11 +92,11 @@ export default function App() {
         return;
       }
       
-      if (path === '/refund' || path === '/refund-policy') {
-        setActiveScreen(SCREENS.REFUND_POLICY);
-        setIsValidating(false);
-        return;
-      }
+    if (path === '/refund' || path === '/refund-policy') {
+      setActiveScreen(SCREENS.REFUND_POLICY);
+      setIsValidating(false);
+      return;
+    }
       
       if (path === '/onboarding' || path === '/onboarding/brand') {
         setActiveScreen(SCREENS.CREATE_PROJECT);

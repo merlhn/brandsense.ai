@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
+import { logger } from "../lib/logger";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,7 +34,7 @@ export function AccountSettings({ onNavigate }: AccountSettingsProps) {
   const handleDeleteAccount = () => {
     // Handle account deletion
     if (typeof import.meta !== 'undefined' && import.meta.env?.DEV) {
-      console.log("Account deleted");
+      logger.info("Account deleted");
     }
     
     // Reset confirmation input

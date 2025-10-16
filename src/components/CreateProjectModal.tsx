@@ -57,8 +57,7 @@ const LANGUAGES = [
 ];
 
 export function CreateProjectModal({ isOpen, onClose, onProjectCreated, onNavigate }: CreateProjectModalProps) {
-  console.log('🔧 CreateProjectModal render - isOpen:', isOpen);
-  console.log('🔧 CreateProjectModal - Component is rendering!');
+  logger.info('CreateProjectModal render', { isOpen });
   
   const [brandName, setBrandName] = useState("");
   const [market, setMarket] = useState("United States");
@@ -208,7 +207,7 @@ export function CreateProjectModal({ isOpen, onClose, onProjectCreated, onNaviga
       });
 
     } catch (error) {
-      console.error('Error creating project:', error);
+      logger.error('Error creating project', { error });
       setError('Network error. Please try again.');
     } finally {
       setIsLoading(false);
@@ -221,7 +220,7 @@ export function CreateProjectModal({ isOpen, onClose, onProjectCreated, onNaviga
     }
   };
 
-  console.log('🔧 CreateProjectModal - Rendering with isOpen:', isOpen);
+  logger.info('CreateProjectModal rendering', { isOpen });
   
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>

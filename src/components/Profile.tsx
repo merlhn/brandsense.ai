@@ -7,6 +7,7 @@ import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
 import { storage } from "../lib/storage";
 import { API_CONFIG } from "../lib/api";
+import { logger } from "../lib/logger";
 import { toast } from "sonner@2.0.3";
 
 interface ProfileProps {
@@ -40,7 +41,7 @@ export function Profile({ onNavigate }: ProfileProps) {
     setFullName(storedFullName || '');
     setPosition(storedPosition || '');
     
-    console.log('📧 Profile loaded:', { email: storedEmail, fullName: storedFullName });
+    logger.info('Profile loaded', { email: storedEmail, fullName: storedFullName });
   }, []);
 
 
