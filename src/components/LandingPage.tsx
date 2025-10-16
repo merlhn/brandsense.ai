@@ -13,7 +13,6 @@ import {
   TrendingUp,
   Target,
   Users,
-  Quote,
   Circle,
   Check,
   TrendingDown,
@@ -99,43 +98,6 @@ const brandExamples = [
   }
 ];
 
-const testimonials = [
-  {
-    name: "Sarah Mitchell",
-    role: "Brand Strategy Director",
-    company: "Fortune 500 Tech Company",
-    content: "Brand Sense transformed how we understand our AI visibility. We discovered our brand was being associated with keywords we never anticipated - both opportunities and risks. The insights helped us refine our messaging strategy and improve our Brand Power score by 23 points in just 3 months.",
-    avatar: "SM"
-  },
-  {
-    name: "Marcus Chen",
-    role: "Head of Marketing",
-    company: "Global Consumer Brand",
-    content: "As AI becomes the primary research tool for consumers, understanding how ChatGPT perceives our brand is critical. Brand Sense gives us real-time insights that traditional market research takes weeks to deliver. The sentiment tracking helped us catch a potential PR issue before it escalated.",
-    avatar: "MC"
-  },
-  {
-    name: "Elena Rodriguez",
-    role: "Chief Marketing Officer",
-    company: "E-commerce Startup",
-    content: "We used Brand Sense to understand our positioning against established competitors. The keyword intelligence revealed we were strongest in 'innovation' but weak in 'trust' - allowing us to pivot our content strategy. Our brand visibility improved 40% in targeted AI conversations.",
-    avatar: "ER"
-  },
-  {
-    name: "James Thompson",
-    role: "VP of Communications",
-    company: "Financial Services Firm",
-    content: "The Brand Identity Mapping feature is incredible. We discovered our brand archetype (The Sage) aligned perfectly with our strategy, but highlighted gaps in 'approachability'. This insight led to a complete messaging overhaul that increased positive sentiment by 31%.",
-    avatar: "JT"
-  },
-  {
-    name: "Priya Patel",
-    role: "Digital Marketing Manager",
-    company: "Sustainable Fashion Brand",
-    content: "Brand Sense helped us validate our sustainability positioning in AI conversations. We found we were strongly associated with 'eco-friendly' and 'ethical fashion' - exactly what we wanted. The multi-market analysis showed us opportunities in Europe we hadn't considered.",
-    avatar: "PP"
-  }
-];
 
 export function LandingPage({ onNavigate }: LandingPageProps) {
   const [showSupportDialog, setShowSupportDialog] = useState(false);
@@ -600,75 +562,6 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-20 px-6 border-t border-border/50">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-foreground mb-4 tracking-tight" style={{ fontSize: '40px', fontWeight: 600 }}>
-              Trusted by marketing leaders
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto" style={{ fontSize: '18px', lineHeight: '1.6' }}>
-              Marketing professionals around the world rely on Brand Sense to understand and improve their brand's AI visibility
-            </p>
-          </motion.div>
-
-          <div className="relative">
-            <div className="flex overflow-x-auto scrollbar-hide gap-6 pb-4">
-              {testimonials.map((testimonial, index) => (
-                <motion.div
-                  key={testimonial.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="flex-shrink-0 w-80 p-6 rounded-xl bg-card border border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group"
-                >
-                  <Quote className="w-8 h-8 text-primary/30 mb-4 group-hover:text-primary/50 transition-colors duration-300" />
-                  
-                  <p className="text-foreground mb-6 text-sm leading-relaxed group-hover:text-foreground/90 transition-colors duration-300">
-                    "{testimonial.content}"
-                  </p>
-                  
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
-                      <span className="text-primary font-semibold text-sm">
-                        {testimonial.avatar}
-                      </span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-foreground font-semibold text-sm group-hover:text-primary transition-colors duration-300">
-                        {testimonial.name}
-                      </p>
-                      <p className="text-muted-foreground text-xs">
-                        {testimonial.role}
-                      </p>
-                      <p className="text-muted-foreground text-xs">
-                        {testimonial.company}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-            
-            {/* Scroll indicators */}
-            <div className="flex justify-center gap-2 mt-6">
-              {testimonials.map((_, index) => (
-                <div
-                  key={index}
-                  className="w-2 h-2 rounded-full bg-border hover:bg-primary/50 transition-colors duration-300 cursor-pointer"
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* CTA Section */}
       <section className="py-20 px-6 border-t border-border/50">
