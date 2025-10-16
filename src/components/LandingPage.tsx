@@ -653,51 +653,53 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
               viewport={{ once: true }}
-              className="p-8 rounded-2xl bg-card border-2 border-border hover:border-primary/20 transition-colors"
+              className="p-8 rounded-2xl bg-card border-2 border-border hover:border-primary/20 transition-colors flex flex-col h-full"
             >
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-foreground mb-2">Starter</h3>
-                <div className="mb-4">
-                  <span className="text-4xl font-bold text-foreground">Free</span>
+              <div className="flex-1">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-foreground mb-2">Starter</h3>
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold text-foreground">Free</span>
+                  </div>
+                  <p className="text-muted-foreground">Perfect for individuals and small businesses</p>
                 </div>
-                <p className="text-muted-foreground">Perfect for individuals and small businesses</p>
-              </div>
 
-              <div className="space-y-4 mb-6">
-                {[
-                  "Single Brand Monitoring",
-                  "Limited data refresh",
-                  "Single Market Analysis for Brand"
-                ].map((feature, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
-                    <span className="text-foreground text-sm">{feature}</span>
-                  </div>
-                ))}
-              </div>
+                <div className="space-y-4 mb-6">
+                  {[
+                    "Single Brand Monitoring",
+                    "Limited data refresh",
+                    "Single Market Analysis for Brand"
+                  ].map((feature, index) => (
+                    <div key={index} className="flex items-start gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                      <span className="text-foreground text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
 
-              {/* Dashboards Section */}
-              <div className="border-t border-border/30 pt-4 mb-6">
-                <h4 className="text-sm font-medium text-foreground mb-3">Dashboards</h4>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
-                    <span className="text-foreground text-sm">Keyword Analysis</span>
+                {/* Dashboards Section */}
+                <div className="border-t border-border/30 pt-4 mb-6">
+                  <h4 className="text-sm font-medium text-foreground mb-3">Dashboards</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                      <span className="text-foreground text-sm">Keyword Analysis</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Settings & Support Section */}
-              <div className="border-t border-border/30 pt-4 mb-6">
-                <h4 className="text-sm font-medium text-foreground mb-3">Settings & Support</h4>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
-                    <span className="text-foreground text-sm">Email Support in 48h</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
-                    <span className="text-foreground text-sm">1 seat in workspace</span>
+                {/* Support Section */}
+                <div className="border-t border-border/30 pt-4 mb-6">
+                  <h4 className="text-sm font-medium text-foreground mb-3">Support</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                      <span className="text-foreground text-sm">Email Support in 48h</span>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                      <span className="text-foreground text-sm">1 seat in workspace</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -717,7 +719,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
-              className="relative p-8 rounded-2xl bg-card border-2 border-primary ring-2 ring-primary/20 shadow-lg shadow-primary/5"
+              className="relative p-8 rounded-2xl bg-card border-2 border-primary ring-2 ring-primary/20 shadow-lg shadow-primary/5 flex flex-col h-full"
             >
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                 <div className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
@@ -725,58 +727,60 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                 </div>
               </div>
 
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-foreground mb-2">Professional</h3>
-                <div className="mb-4">
-                  <span className="text-4xl font-bold text-foreground">{isAnnual ? "$100" : "$9.99"}</span>
-                  <span className="text-muted-foreground ml-1">{isAnnual ? "/year" : "/month"}</span>
+              <div className="flex-1">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-foreground mb-2">Professional</h3>
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold text-foreground">{isAnnual ? "$100" : "$9.99"}</span>
+                    <span className="text-muted-foreground ml-1">{isAnnual ? "/year" : "/month"}</span>
+                  </div>
+                  <p className="text-muted-foreground">For growing businesses and marketing teams</p>
                 </div>
-                <p className="text-muted-foreground">For growing businesses and marketing teams</p>
-              </div>
 
-              <div className="space-y-4 mb-6">
-                {[
-                  "Multi Brand Monitoring up to 10",
-                  "Unlimited Data refresh",
-                  "Multi Market Analysis for Brand"
-                ].map((feature, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
-                    <span className="text-foreground text-sm">{feature}</span>
-                  </div>
-                ))}
-              </div>
+                <div className="space-y-4 mb-6">
+                  {[
+                    "Multi Brand Monitoring up to 10",
+                    "Unlimited Data refresh",
+                    "Multi Market Analysis for Brand"
+                  ].map((feature, index) => (
+                    <div key={index} className="flex items-start gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                      <span className="text-foreground text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
 
-              {/* Dashboards Section */}
-              <div className="border-t border-border/30 pt-4 mb-6">
-                <h4 className="text-sm font-medium text-foreground mb-3">Dashboards</h4>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
-                    <span className="text-foreground text-sm">Keyword Analysis</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
-                    <span className="text-foreground text-sm">Sentiment Analysis</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
-                    <span className="text-foreground text-sm">Brand Identity</span>
+                {/* Dashboards Section */}
+                <div className="border-t border-border/30 pt-4 mb-6">
+                  <h4 className="text-sm font-medium text-foreground mb-3">Dashboards</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                      <span className="text-foreground text-sm">Keyword Analysis</span>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                      <span className="text-foreground text-sm">Sentiment Analysis</span>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                      <span className="text-foreground text-sm">Brand Identity</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Settings & Support Section */}
-              <div className="border-t border-border/30 pt-4 mb-6">
-                <h4 className="text-sm font-medium text-foreground mb-3">Settings & Support</h4>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
-                    <span className="text-foreground text-sm">Priority Support (24h)</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
-                    <span className="text-foreground text-sm">2 seats in workspace</span>
+                {/* Support Section */}
+                <div className="border-t border-border/30 pt-4 mb-6">
+                  <h4 className="text-sm font-medium text-foreground mb-3">Support</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                      <span className="text-foreground text-sm">Priority Support (24h)</span>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 shrink-0" />
+                      <span className="text-foreground text-sm">1 seat in workspace</span>
+                    </div>
                   </div>
                 </div>
               </div>
