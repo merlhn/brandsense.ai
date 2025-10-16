@@ -37,9 +37,9 @@
   ],
   "redirects": [
     {
-      "source": "/",
-      "destination": "/landing",
-      "permanent": false
+      "source": "/landing",
+      "destination": "/",
+      "permanent": true
     },
     {
       "source": "/dashboard",

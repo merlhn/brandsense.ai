@@ -32,7 +32,15 @@ export default function App() {
       const path = window.location.pathname;
       
       // URL-based routing for all pages
-      if (path === '/landing' || path === '/') {
+      if (path === '/') {
+        setActiveScreen(SCREENS.LANDING);
+        setIsValidating(false);
+        return;
+      }
+      
+      // Redirect /landing to root
+      if (path === '/landing') {
+        window.history.replaceState({}, '', '/');
         setActiveScreen(SCREENS.LANDING);
         setIsValidating(false);
         return;
