@@ -1289,6 +1289,7 @@ app.get('/make-server-cf9a9609/projects/:id', async (c) => {
         language: project.language,
         description: project.description,
         timeframe: project.timeframe,
+        ai_model: project.ai_model,
         data_status: project.data_status,
         last_refresh_at: project.last_refreshed_at,
         created_at: project.created_at,
