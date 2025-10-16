@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.3] - "Landing Page Cleanup & Routing Fix" - 2025-01-08
+
+### 🧹 Landing Page Cleanup
+
+#### Testimonials Section Removal
+- **Removed:** "Trusted by marketing leaders" testimonials section
+- **Removed:** 5 testimonial cards with detailed customer feedback
+- **Removed:** Testimonials array and related data structures
+- **Cleaned:** Unused Quote icon import
+- **Result:** Cleaner, more focused landing page flow
+
+#### Hero Section Simplification
+- **Removed:** "Powered by GPT-4o" attribution badge
+- **Simplified:** Hero section layout and messaging
+- **Result:** More professional and focused hero presentation
+
+### 🛣️ Routing Improvements
+
+#### Root Path Configuration
+- **Fixed:** Landing page now serves directly at root (`/`)
+- **Added:** Automatic redirect from `/landing` to root for backward compatibility
+- **Updated:** Vercel deployment configuration for proper routing
+- **Result:** Clean URLs without `/landing` path
+
+#### URL Structure
+- **Before:** `https://brandsense.digital/landing`
+- **After:** `https://brandsense.digital/`
+- **Backward Compatibility:** `/landing` automatically redirects to root
+
+### 🔧 Technical Improvements
+
+#### Code Cleanup
+- **Removed:** 107 lines of testimonials-related code
+- **Removed:** 6 lines of GPT-4o badge code
+- **Cleaned:** Unused imports and components
+- **Result:** Reduced bundle size and cleaner codebase
+
+#### Routing Logic
+- **Enhanced:** URL-based routing with proper redirects
+- **Added:** Browser history management for clean URLs
+- **Updated:** Vercel configuration for production deployment
+
+### ✅ Quality Assurance
+- All routing changes tested locally
+- Backward compatibility verified
+- No breaking changes to existing functionality
+- Clean URL structure implemented
+- Landing page flow optimized
+
+---
+
 ## [1.0.2] - "Domain Update & UI Improvements" - 2025-01-08
 
 ### 🌐 Domain Updates
