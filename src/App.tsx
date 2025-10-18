@@ -155,6 +155,9 @@ export default function App() {
       [SCREENS.SESSION_EXPIRED]: '/session-expired',
       [SCREENS.CREATE_PROJECT]: '/onboarding',
       [SCREENS.DASHBOARD]: '/dashboard',
+      [SCREENS.TERMS_OF_SERVICE]: '/terms-of-service',
+      [SCREENS.PRIVACY_POLICY]: '/privacy-policy',
+      [SCREENS.REFUND_POLICY]: '/refund-policy',
     };
     
     const path = pathMap[screen] || '/landing';

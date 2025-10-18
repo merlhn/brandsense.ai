@@ -45,6 +45,21 @@
       "source": "/dashboard",
       "destination": "/dashboard/identity",
       "permanent": false
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms-of-service",
+      "permanent": true
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy-policy",
+      "permanent": true
+    },
+    {
+      "source": "/refund",
+      "destination": "/refund-policy",
+      "permanent": true
     }
   ]
 }
