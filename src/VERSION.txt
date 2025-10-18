@@ -1,3 +1,3 @@
-1.0.3
-Landing Page Cleanup & Routing Fix
-2025-01-08
+1.0.4
+Local Development Environment & Performance Optimizations
+2025-01-18
